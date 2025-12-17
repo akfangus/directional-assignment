@@ -12,11 +12,11 @@ interface BoardToolbarProps {
   searchValue: string;
   sortValue: string;
   orderValue: "asc" | "desc";
-  categoryValue?: "NOTICE" | "FREE";
+  categoryValue?: "NOTICE" | "QNA" | "FREE";
   onSearchChange: (value: string) => void;
   onSortChange: (value: string) => void;
   onOrderChange: (value: "asc" | "desc") => void;
-  onCategoryChange: (value?: "NOTICE" | "FREE") => void;
+  onCategoryChange: (value?: "NOTICE" | "QNA" | "FREE") => void;
   onCreateClick: () => void;
 }
 
@@ -77,6 +77,12 @@ export function BoardToolbar({
             onClick={() => onCategoryChange("NOTICE")}
           >
             공지사항
+          </CategoryButton>
+          <CategoryButton
+            type={categoryValue === "QNA" ? "primary" : "default"}
+            onClick={() => onCategoryChange("QNA")}
+          >
+            Q&A
           </CategoryButton>
           <CategoryButton
             type={categoryValue === "FREE" ? "primary" : "default"}

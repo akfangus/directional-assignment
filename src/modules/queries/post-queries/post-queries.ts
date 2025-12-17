@@ -60,7 +60,7 @@ export const PostQueries = {
    */
   update: (id: string) => ({
     mutationFn: async (params: Post.UpdateParams) => {
-      const response = await apiClient.put<Post.Post>(
+      const response = await apiClient.patch<Post.Post>(
         `${BASE_URL}/${id}`,
         params
       );

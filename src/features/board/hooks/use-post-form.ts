@@ -18,7 +18,7 @@ export function usePostForm(props?: UsePostFormProps) {
 
   const handleChange = useCallback(
     (field: keyof Post.CreateParams) =>
-      (value: string | string[] | "NOTICE" | "FREE") => {
+      (value: string | string[] | "NOTICE" | "QNA" | "FREE") => {
         setFormData((prev) => ({ ...prev, [field]: value }));
       },
     []

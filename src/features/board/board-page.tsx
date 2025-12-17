@@ -4,29 +4,23 @@
  * BoardPage - 게시판 메인 페이지
  */
 
-import { useState, useCallback, useMemo } from "react";
+import { useState, useMemo } from "react";
 import styled from "styled-components";
 import { BoardToolbar } from "./components/board-toolbar";
 import { BoardTable } from "./components/board-table";
 import { PostFormModal } from "./components/post-form-modal";
 import { DeleteConfirmModal } from "./components/delete-confirm-modal";
 import { usePostsInfinite } from "./hooks/use-posts-infinite";
-import { useCreatePost } from "./hooks/use-create-post";
-import { useUpdatePost } from "./hooks/use-update-post";
-import { useDeletePost } from "./hooks/use-delete-post";
+import { useBoard } from "./hooks/use-board";
 
 export function BoardPage(): React.ReactElement {
   // 필터 상태
   const [search, setSearch] = useState("");
   const [sort, setSort] = useState<"title" | "createdAt">("createdAt");
   const [order, setOrder] = useState<"asc" | "desc">("desc");
-  const [category, setCategory] = useState<"NOTICE" | "FREE" | undefined>();
-
-  // 모달 상태
-  const [createModalOpen, setCreateModalOpen] = useState(false);
-  const [editModalOpen, setEditModalOpen] = useState(false);
-  const [deleteModalOpen, setDeleteModalOpen] = useState(false);
-  const [selectedPost, setSelectedPost] = useState<Post.Post | null>(null);
+  const [category, setCategory] = useState<
+    "NOTICE" | "QNA" | "FREE" | undefined
+  >();
 
   // 데이터 조회
   const { data, fetchNextPage, hasNextPage, isFetchingNextPage, isLoading } =
@@ -38,69 +32,28 @@ export function BoardPage(): React.ReactElement {
       category,
     });
 
-  // Mutations
-  const createMutation = useCreatePost();
-  const updateMutation = useUpdatePost(selectedPost?.id || "");
-  const deleteMutation = useDeletePost(selectedPost?.id || "");
+  // 게시판 로직 (모달, mutation, 핸들러)
+  const {
+    createModalOpen,
+    editModalOpen,
+    deleteModalOpen,
+    selectedPost,
+    isCreating,
+    isUpdating,
+    isDeleting,
+    handleCreateClick,
+    handleEditClick,
+    handleDeleteClick,
+    handleCreateSubmit,
+    handleEditSubmit,
+    handleDeleteConfirm,
+    handleModalCancel,
+  } = useBoard();
 
   // 전체 게시글 목록
   const posts = useMemo(() => {
     return data?.pages.flatMap((page) => page.items) || [];
   }, [data]);
-
-  // 핸들러
-  const handleCreateClick = useCallback(() => {
-    setCreateModalOpen(true);
-  }, []);
-
-  const handleEditClick = useCallback((post: Post.Post) => {
-    setSelectedPost(post);
-    setEditModalOpen(true);
-  }, []);
-
-  const handleDeleteClick = useCallback((post: Post.Post) => {
-    setSelectedPost(post);
-    setDeleteModalOpen(true);
-  }, []);
-
-  const handleCreateSubmit = useCallback(
-    (data: Post.CreateParams) => {
-      createMutation.mutate(data, {
-        onSuccess: () => {
-          setCreateModalOpen(false);
-        },
-      });
-    },
-    [createMutation.mutate]
-  );
-
-  const handleEditSubmit = useCallback(
-    (data: Post.UpdateParams) => {
-      updateMutation.mutate(data, {
-        onSuccess: () => {
-          setEditModalOpen(false);
-          setSelectedPost(null);
-        },
-      });
-    },
-    [updateMutation.mutate]
-  );
-
-  const handleDeleteConfirm = useCallback(() => {
-    deleteMutation.mutate(undefined, {
-      onSuccess: () => {
-        setDeleteModalOpen(false);
-        setSelectedPost(null);
-      },
-    });
-  }, [deleteMutation.mutate]);
-
-  const handleModalCancel = useCallback(() => {
-    setCreateModalOpen(false);
-    setEditModalOpen(false);
-    setDeleteModalOpen(false);
-    setSelectedPost(null);
-  }, []);
 
   if (isLoading) {
     return (
@@ -138,7 +91,7 @@ export function BoardPage(): React.ReactElement {
         mode="create"
         onCancel={handleModalCancel}
         onSubmit={handleCreateSubmit}
-        loading={createMutation.isPending}
+        loading={isCreating}
       />
 
       <PostFormModal
@@ -147,7 +100,7 @@ export function BoardPage(): React.ReactElement {
         initialData={selectedPost || undefined}
         onCancel={handleModalCancel}
         onSubmit={handleEditSubmit}
-        loading={updateMutation.isPending}
+        loading={isUpdating}
       />
 
       <DeleteConfirmModal
@@ -155,7 +108,7 @@ export function BoardPage(): React.ReactElement {
         post={selectedPost}
         onConfirm={handleDeleteConfirm}
         onCancel={handleModalCancel}
-        loading={deleteMutation.isPending}
+        loading={isDeleting}
       />
     </Container>
   );

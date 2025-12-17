@@ -40,12 +40,10 @@ const getColumns = (
     size: 100,
     minSize: 80,
     cell: ({ getValue }) => {
-      const category = getValue() as "NOTICE" | "FREE";
-      return (
-        <Tag color={category === "NOTICE" ? "blue" : "green"}>
-          {category === "NOTICE" ? "공지사항" : "자유게시판"}
-        </Tag>
-      );
+      const category = getValue() as Post.Category;
+      const colorMap = { NOTICE: "blue", QNA: "orange", FREE: "green" };
+      const labelMap = { NOTICE: "공지사항", QNA: "Q&A", FREE: "자유게시판" };
+      return <Tag color={colorMap[category]}>{labelMap[category]}</Tag>;
     },
   },
   {

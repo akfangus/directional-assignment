@@ -6,12 +6,14 @@ declare namespace Post {
   /**
    * 게시글 객체
    */
+  type Category = "NOTICE" | "QNA" | "FREE";
+
   interface Post {
     id: string;
     userId: string;
     title: string;
     body: string;
-    category: "NOTICE" | "FREE";
+    category: Category;
     tags: string[];
     createdAt: string;
   }
@@ -31,7 +33,7 @@ declare namespace Post {
   interface CreateParams {
     title: string;
     body: string;
-    category: "NOTICE" | "FREE";
+    category: Category;
     tags: string[];
   }
 
@@ -49,6 +51,6 @@ declare namespace Post {
     order?: "asc" | "desc";
     sort?: "title" | "createdAt";
     search?: string;
-    category?: "NOTICE" | "FREE";
+    category?: Category;
   }
 }

@@ -84,6 +84,7 @@ export function PostFormModal({
             }
             options={[
               { label: "공지사항", value: "NOTICE" },
+              { label: "Q&A", value: "QNA" },
               { label: "자유게시판", value: "FREE" },
             ]}
           />
