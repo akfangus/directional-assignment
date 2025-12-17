@@ -9,6 +9,7 @@ import { BoardTable } from "./components/board-table";
 import { PostFormModal } from "./components/post-form-modal";
 import { DeleteConfirmModal } from "./components/delete-confirm-modal";
 import { useBoard } from "./hooks/use-board";
+import { Spinner } from "@/components/ui/spinner";
 
 export function BoardPage(): React.ReactElement {
   // 필터 상태
@@ -51,11 +52,7 @@ export function BoardPage(): React.ReactElement {
   }, [data]);
 
   if (isLoading) {
-    return (
-      <Container>
-        <div style={{ textAlign: "center", padding: "40px" }}>로딩 중...</div>
-      </Container>
-    );
+    return <Spinner />;
   }
 
   return (
