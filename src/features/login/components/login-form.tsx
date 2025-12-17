@@ -1,11 +1,5 @@
 "use client";
 
-/**
- * LoginForm - 로그인 폼 컴포넌트
- * 이메일, 비밀번호 입력 및 로그인 처리
- */
-
-import { useCallback } from "react";
 import { Form, Input } from "antd";
 import { MailOutlined, LockOutlined } from "@ant-design/icons";
 import { SubmitButton } from "../login-styled";
