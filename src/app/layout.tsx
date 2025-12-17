@@ -2,9 +2,8 @@ import type { Metadata } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
 import StyledComponentsRegistry from "@/shared/libs/provider/styled-components-registry";
 import UIThemeProvider from "@/shared/libs/provider/ui-theme-provider";
-import "./globals.css";
-import { AppLayout } from "@/components/layout";
 import { QueryProvider } from "@/shared/libs/provider/tanstack-query-provider";
+import "./globals.css";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -25,7 +24,7 @@ export default function RootLayout({
   children,
 }: Readonly<{
   children: React.ReactNode;
-}>) {
+}>): React.ReactElement {
   return (
     <html lang="ko">
       <body
@@ -33,9 +32,7 @@ export default function RootLayout({
       >
         <StyledComponentsRegistry>
           <UIThemeProvider>
-            <QueryProvider>
-              <AppLayout title="Dashboard">{children}</AppLayout>
-            </QueryProvider>
+            <QueryProvider>{children}</QueryProvider>
           </UIThemeProvider>
         </StyledComponentsRegistry>
       </body>

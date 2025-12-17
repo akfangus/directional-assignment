@@ -5,7 +5,7 @@
 
 "use client";
 
-import { ConfigProvider } from "antd";
+import { ConfigProvider, App } from "antd";
 import { ThemeProvider as StyledThemeProvider } from "styled-components";
 import { antdTheme, styledTheme } from "@/theme";
 
@@ -26,7 +26,11 @@ function UIThemeProvider({
 }: UIThemeProviderProps): React.ReactElement {
   return (
     <ConfigProvider theme={antdTheme}>
-      <StyledThemeProvider theme={styledTheme}>{children}</StyledThemeProvider>
+      <App>
+        <StyledThemeProvider theme={styledTheme}>
+          {children}
+        </StyledThemeProvider>
+      </App>
     </ConfigProvider>
   );
 }
