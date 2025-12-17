@@ -1,2 +1,1 @@
-// Components
 export { BoardPage } from "./board-page";

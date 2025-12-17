@@ -13,26 +13,19 @@ import {
   HTTP_ERROR_MESSAGES,
   type ApiErrorResponse,
 } from "./api-error";
-
-/**
- * 토큰을 가져오는 함수
- * 실제 구현에서는 localStorage, cookie, 또는 상태 관리에서 가져옴
- */
-function getAccessToken(): string | null {
-  // 클라이언트 사이드에서만 실행
-  if (typeof window === "undefined") return null;
-
-  // TODO: 실제 토큰 저장 위치에 맞게 수정
-  return localStorage.getItem("accessToken");
-}
+import {
+  getTokenFromCookie,
+  removeTokenCookie,
+} from "@/shared/libs/cookie/token-cookie";
 
 /**
  * 토큰 만료 시 처리 함수
  */
 function handleTokenExpired(): void {
-  // TODO: 실제 로그아웃 처리 또는 토큰 갱신 로직
+  // 쿠키에서 토큰 제거
+  removeTokenCookie();
+
   if (typeof window !== "undefined") {
-    localStorage.removeItem("accessToken");
     window.location.href = "/login";
   }
 }
@@ -53,7 +46,7 @@ const apiClient: AxiosInstance = axios.create({
  */
 apiClient.interceptors.request.use(
   (config: InternalAxiosRequestConfig): InternalAxiosRequestConfig => {
-    const token = getAccessToken();
+    const token = getTokenFromCookie();
 
     if (token && config.headers) {
       config.headers.Authorization = `Bearer ${token}`;
