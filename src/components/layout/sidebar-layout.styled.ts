@@ -1,9 +1,5 @@
-/**
- * AppLayout 스타일 컴포넌트
- */
-
 import styled from "styled-components";
-import { Layout, Menu } from "antd";
+import { Layout } from "antd";
 
 const { Sider, Content } = Layout;
 
@@ -42,11 +38,6 @@ export const LogoTitle = styled.h1`
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
-`;
-
-export const StyledMenu = styled(Menu)`
-  flex: 1;
-  border-right: 0;
 `;
 
 export const ContentWrapper = styled(Layout)`

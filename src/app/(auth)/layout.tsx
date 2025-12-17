@@ -1,12 +1,9 @@
-"use client";
-
 /**
  * 인증이 필요한 페이지들의 레이아웃
- * AuthGuard로 인증 체크 + AppLayout으로 사이드바 표시
+ * Middleware에서 인증 체크 수행, SidebarLayout으로 사이드바 표시
  */
 
-import { AuthGuard } from "@/components/auth";
-import { AppLayout } from "@/components/layout";
+import { SidebarLayout } from "@/components/layout";
 
 interface AuthLayoutProps {
   children: React.ReactNode;
@@ -15,9 +12,5 @@ interface AuthLayoutProps {
 export default function AuthLayout({
   children,
 }: AuthLayoutProps): React.ReactElement {
-  return (
-    <AuthGuard>
-      <AppLayout title="Dashboard">{children}</AppLayout>
-    </AuthGuard>
-  );
+  return <SidebarLayout title="Dashboard">{children}</SidebarLayout>;
 }
