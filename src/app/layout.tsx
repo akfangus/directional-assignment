@@ -1,8 +1,10 @@
 import type { Metadata } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
-import StyledComponentsRegistry from "@/lib/styled-components-registry";
-import { QueryProvider } from "@/lib/query-provider";
+import StyledComponentsRegistry from "@/shared/libs/provider/styled-components-registry";
+import UIThemeProvider from "@/shared/libs/provider/ui-theme-provider";
+import { QueryProvider } from "@/shared/libs/tanstack-query/query-provider";
 import "./globals.css";
+import { AppLayout } from "@/components/layout";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -30,7 +32,11 @@ export default function RootLayout({
         className={`${geistSans.variable} ${geistMono.variable} antialiased`}
       >
         <StyledComponentsRegistry>
-          <QueryProvider>{children}</QueryProvider>
+          <UIThemeProvider>
+            <QueryProvider>
+              <AppLayout title="Dashboard">{children}</AppLayout>
+            </QueryProvider>
+          </UIThemeProvider>
         </StyledComponentsRegistry>
       </body>
     </html>
