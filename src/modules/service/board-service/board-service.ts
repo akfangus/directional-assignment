@@ -4,22 +4,15 @@
  */
 
 import { apiClient } from "@/shared/apis";
-import type {
-  BoardPost,
-  BoardPostsResponse,
-  BoardPostsParams,
-  CreateBoardPostParams,
-  UpdateBoardPostParams,
-} from "@/modules/service/board-service/board-service.types";
 
 export class BoardService {
   /**
    * 게시글 목록 조회
    */
   static async fetchPosts(
-    params: BoardPostsParams = {}
-  ): Promise<BoardPostsResponse> {
-    const response = await apiClient.get<BoardPostsResponse>("/posts", {
+    params: Board.PostsParams = {}
+  ): Promise<Board.PostsResponse> {
+    const response = await apiClient.get<Board.PostsResponse>("/posts", {
       params,
     });
     return response.data;
@@ -28,34 +21,34 @@ export class BoardService {
   /**
    * 게시글 상세 조회
    */
-  static async fetchPost(id: number): Promise<BoardPost> {
-    const response = await apiClient.get<BoardPost>(`/posts/${id}`);
+  static async fetchPost(id: string): Promise<Board.Post> {
+    const response = await apiClient.get<Board.Post>(`/posts/${id}`);
     return response.data;
   }
 
   /**
    * 게시글 생성
    */
-  static async createPost(params: CreateBoardPostParams): Promise<BoardPost> {
-    const response = await apiClient.post<BoardPost>("/posts", params);
+  static async createPost(params: Board.CreatePostParams): Promise<Board.Post> {
+    const response = await apiClient.post<Board.Post>("/posts", params);
     return response.data;
   }
 
   /**
    * 게시글 수정
    */
-  static async updatePost({
-    id,
-    ...params
-  }: UpdateBoardPostParams): Promise<BoardPost> {
-    const response = await apiClient.put<BoardPost>(`/posts/${id}`, params);
+  static async updatePost(
+    id: string,
+    params: Board.UpdatePostParams
+  ): Promise<Board.Post> {
+    const response = await apiClient.patch<Board.Post>(`/posts/${id}`, params);
     return response.data;
   }
 
   /**
    * 게시글 삭제
    */
-  static async deletePost(id: number): Promise<void> {
+  static async deletePost(id: string): Promise<void> {
     await apiClient.delete(`/posts/${id}`);
   }
 }

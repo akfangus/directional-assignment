@@ -1,15 +1,13 @@
+/**
+ * 게시판 TanStack Query 옵션
+ * queryKey와 queryFn을 정의하는 클래스
+ */
+
 import type {
   UseQueryOptions,
   UseMutationOptions,
 } from "@tanstack/react-query";
 import { BoardService } from "@/modules/service/board-service";
-import type {
-  BoardPost,
-  BoardPostsResponse,
-  BoardPostsParams,
-  CreateBoardPostParams,
-  UpdateBoardPostParams,
-} from "@/modules/service/board-service/board-service.types";
 
 export class BoardQueries {
   static readonly POSTS_LIMIT_PER_PAGE = 20;
@@ -17,19 +15,19 @@ export class BoardQueries {
   static readonly keys = {
     root: ["board"] as const,
     posts: () => [...this.keys.root, "posts"] as const,
-    postsList: (params: BoardPostsParams) =>
+    postsList: (params: Board.PostsParams) =>
       [...this.keys.posts(), params] as const,
-    postsInfinite: (params: Omit<BoardPostsParams, "page">) =>
+    postsInfinite: (params: Omit<Board.PostsParams, "page">) =>
       [...this.keys.posts(), "infinite", params] as const,
-    post: (id: number) => [...this.keys.root, "post", id] as const,
+    post: (id: string) => [...this.keys.root, "post", id] as const,
   };
 
   /**
    * 게시글 목록 조회 (일반 페이지네이션)
    */
   static queryPosts(
-    params: BoardPostsParams = {}
-  ): UseQueryOptions<BoardPostsResponse> {
+    params: Board.PostsParams = {}
+  ): UseQueryOptions<Board.PostsResponse> {
     return {
       queryKey: this.keys.postsList(params),
       queryFn: () =>
@@ -43,7 +41,7 @@ export class BoardQueries {
   /**
    * 게시글 목록 조회 (무한 스크롤)
    */
-  static queryInfinitePosts(params: Omit<BoardPostsParams, "page"> = {}) {
+  static queryInfinitePosts(params: Omit<Board.PostsParams, "page"> = {}) {
     return {
       queryKey: this.keys.postsInfinite(params),
       queryFn: async ({ pageParam }: { pageParam: number }) =>
@@ -54,8 +52,8 @@ export class BoardQueries {
         }),
       initialPageParam: 1,
       getNextPageParam: (
-        lastPage: BoardPostsResponse,
-        allPages: BoardPostsResponse[]
+        lastPage: Board.PostsResponse,
+        allPages: Board.PostsResponse[]
       ) => {
         const hasMore = lastPage.items.length >= this.POSTS_LIMIT_PER_PAGE;
         return hasMore ? allPages.length + 1 : undefined;
@@ -66,11 +64,11 @@ export class BoardQueries {
   /**
    * 게시글 상세 조회
    */
-  static queryPost(id: number): UseQueryOptions<BoardPost> {
+  static queryPost(id: string): UseQueryOptions<Board.Post> {
     return {
       queryKey: this.keys.post(id),
       queryFn: () => BoardService.fetchPost(id),
-      enabled: id > 0,
+      enabled: !!id,
     };
   }
 
@@ -78,9 +76,9 @@ export class BoardQueries {
    * 게시글 생성 Mutation
    */
   static mutationCreatePost(): UseMutationOptions<
-    BoardPost,
+    Board.Post,
     Error,
-    CreateBoardPostParams
+    Board.CreatePostParams
   > {
     return {
       mutationFn: (params) => BoardService.createPost(params),
@@ -91,19 +89,19 @@ export class BoardQueries {
    * 게시글 수정 Mutation
    */
   static mutationUpdatePost(): UseMutationOptions<
-    BoardPost,
+    Board.Post,
     Error,
-    UpdateBoardPostParams
+    { id: string; params: Board.UpdatePostParams }
   > {
     return {
-      mutationFn: (params) => BoardService.updatePost(params),
+      mutationFn: ({ id, params }) => BoardService.updatePost(id, params),
     };
   }
 
   /**
    * 게시글 삭제 Mutation
    */
-  static mutationDeletePost(): UseMutationOptions<void, Error, number> {
+  static mutationDeletePost(): UseMutationOptions<void, Error, string> {
     return {
       mutationFn: (id) => BoardService.deletePost(id),
     };
