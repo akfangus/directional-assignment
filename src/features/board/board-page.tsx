@@ -1,16 +1,13 @@
 "use client";
 
-/**
- * BoardPage - 게시판 메인 페이지
- */
-
 import { useState, useMemo } from "react";
+import { useInfiniteQuery } from "@tanstack/react-query";
 import styled from "styled-components";
+import { BoardQueries } from "@/modules/queries/board-queries";
 import { BoardToolbar } from "./components/board-toolbar";
 import { BoardTable } from "./components/board-table";
 import { PostFormModal } from "./components/post-form-modal";
 import { DeleteConfirmModal } from "./components/delete-confirm-modal";
-import { usePostsInfinite } from "./hooks/use-posts-infinite";
 import { useBoard } from "./hooks/use-board";
 
 export function BoardPage(): React.ReactElement {
@@ -20,15 +17,15 @@ export function BoardPage(): React.ReactElement {
   const [order, setOrder] = useState<Board.OrderType>("desc");
   const [category, setCategory] = useState<Board.Category | undefined>();
 
-  // 데이터 조회
   const { data, fetchNextPage, hasNextPage, isFetchingNextPage, isLoading } =
-    usePostsInfinite({
-      limit: 20,
-      search: search || undefined,
-      sort,
-      order,
-      category,
-    });
+    useInfiniteQuery(
+      BoardQueries.queryInfinitePosts({
+        search: search || undefined,
+        sort,
+        order,
+        category,
+      })
+    );
 
   // 게시판 로직 (모달, mutation, 핸들러)
   const {

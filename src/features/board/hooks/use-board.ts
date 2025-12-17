@@ -4,13 +4,12 @@
  */
 
 import { useState, useCallback } from "react";
-import { useMutation, useQueryClient } from "@tanstack/react-query";
+import { useMutation } from "@tanstack/react-query";
 import { App } from "antd";
-import { PostQueries } from "@/modules/queries/post-queries";
+import { BoardQueries } from "@/modules/queries/board-queries";
 import { validatePostParams } from "../utils/forbidden-words";
 
 export function useBoard() {
-  const queryClient = useQueryClient();
   const { message } = App.useApp();
 
   // 모달 상태
@@ -21,7 +20,7 @@ export function useBoard() {
 
   // Mutations
   const { mutate: createPost, isPending: isCreating } = useMutation({
-    ...PostQueries.create(),
+    ...BoardQueries.mutationCreatePost(),
     onMutate: (params) => {
       const validation = validatePostParams(params);
       if (!validation.valid) {
@@ -30,7 +29,7 @@ export function useBoard() {
       }
     },
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ["posts", "list"] });
+      // 쿼리 무효화는 BoardQueries에서 자동 처리
       message.success("게시글이 작성되었습니다");
       setCreateModalOpen(false);
     },
@@ -42,8 +41,8 @@ export function useBoard() {
   });
 
   const { mutate: updatePost, isPending: isUpdating } = useMutation({
-    ...PostQueries.update(selectedPost?.id || ""),
-    onMutate: (params) => {
+    ...BoardQueries.mutationUpdatePost(),
+    onMutate: ({ params }) => {
       const validation = validatePostParams(params);
       if (!validation.valid) {
         message.error(validation.message);
@@ -51,10 +50,7 @@ export function useBoard() {
       }
     },
     onSuccess: () => {
-      queryClient.invalidateQueries({
-        queryKey: ["posts", "detail", selectedPost?.id],
-      });
-      queryClient.invalidateQueries({ queryKey: ["posts", "list"] });
+      // 쿼리 무효화는 BoardQueries에서 자동 처리
       message.success("게시글이 수정되었습니다");
       setEditModalOpen(false);
       setSelectedPost(null);
@@ -67,9 +63,9 @@ export function useBoard() {
   });
 
   const { mutate: deletePost, isPending: isDeleting } = useMutation({
-    ...PostQueries.delete(selectedPost?.id || ""),
+    ...BoardQueries.mutationDeletePost(),
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ["posts", "list"] });
+      // 쿼리 무효화는 BoardQueries에서 자동 처리
       message.success("게시글이 삭제되었습니다");
       setDeleteModalOpen(false);
       setSelectedPost(null);
@@ -103,14 +99,16 @@ export function useBoard() {
 
   const handleEditSubmit = useCallback(
     (data: Board.UpdatePostParams) => {
-      updatePost(data);
+      if (!selectedPost?.id) return;
+      updatePost({ id: selectedPost.id, params: data });
     },
-    [updatePost]
+    [updatePost, selectedPost?.id]
   );
 
   const handleDeleteConfirm = useCallback(() => {
-    deletePost(undefined);
-  }, [deletePost]);
+    if (!selectedPost?.id) return;
+    deletePost(selectedPost.id);
+  }, [deletePost, selectedPost?.id]);
 
   const handleModalCancel = useCallback(() => {
     setCreateModalOpen(false);
@@ -120,16 +118,13 @@ export function useBoard() {
   }, []);
 
   return {
-    // 모달 상태
     createModalOpen,
     editModalOpen,
     deleteModalOpen,
     selectedPost,
-    // mutation pending 상태
     isCreating,
     isUpdating,
     isDeleting,
-    // 핸들러
     handleCreateClick,
     handleEditClick,
     handleDeleteClick,

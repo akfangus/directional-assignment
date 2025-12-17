@@ -8,6 +8,7 @@ import type {
   UseMutationOptions,
 } from "@tanstack/react-query";
 import { BoardService } from "@/modules/service/board-service";
+import { getQueryClient } from "@/shared/libs/query-client";
 
 export class BoardQueries {
   static readonly POSTS_LIMIT_PER_PAGE = 20;
@@ -82,6 +83,10 @@ export class BoardQueries {
   > {
     return {
       mutationFn: (params) => BoardService.createPost(params),
+      onSuccess: () => {
+        // 생성 성공 시 게시글 목록 자동 무효화
+        this.invalidate.posts();
+      },
     };
   }
 
@@ -95,6 +100,11 @@ export class BoardQueries {
   > {
     return {
       mutationFn: ({ id, params }) => BoardService.updatePost(id, params),
+      onSuccess: (data, variables) => {
+        // 수정 성공 시 해당 게시글 상세와 목록 자동 무효화
+        this.invalidate.post(variables.id);
+        this.invalidate.posts();
+      },
     };
   }
 
@@ -104,6 +114,40 @@ export class BoardQueries {
   static mutationDeletePost(): UseMutationOptions<void, Error, string> {
     return {
       mutationFn: (id) => BoardService.deletePost(id),
+      onSuccess: () => {
+        // 삭제 성공 시 게시글 목록 자동 무효화
+        this.invalidate.posts();
+      },
     };
   }
+
+  /**
+   * 쿼리 무효화 헬퍼 메서드
+   * QueryClient를 전달받지 않고 싱글톤 인스턴스를 사용
+   */
+  static invalidate = {
+    /**
+     * 게시글 목록 무효화 (모든 params)
+     */
+    posts: () => {
+      const queryClient = getQueryClient();
+      return queryClient.invalidateQueries({ queryKey: this.keys.posts() });
+    },
+
+    /**
+     * 특정 게시글 상세 무효화
+     */
+    post: (id: string) => {
+      const queryClient = getQueryClient();
+      return queryClient.invalidateQueries({ queryKey: this.keys.post(id) });
+    },
+
+    /**
+     * 모든 게시판 관련 쿼리 무효화
+     */
+    all: () => {
+      const queryClient = getQueryClient();
+      return queryClient.invalidateQueries({ queryKey: this.keys.root });
+    },
+  };
 }

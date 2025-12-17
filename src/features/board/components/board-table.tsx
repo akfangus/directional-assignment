@@ -2,7 +2,8 @@
  * BoardTable - DataTable 기반 게시글 목록
  */
 
-import { useRef, useEffect } from "react";
+import { useEffect } from "react";
+import { useInView } from "react-intersection-observer";
 import { ColumnDef } from "@tanstack/react-table";
 import { Button, Tag, Space } from "antd";
 import { EditOutlined, DeleteOutlined } from "@ant-design/icons";
@@ -117,40 +118,40 @@ export function BoardTable({
   isFetchingNextPage,
   onLoadMore,
 }: BoardTableProps): React.ReactElement {
-  const containerRef = useRef<HTMLDivElement>(null);
+  // Intersection Observer로 무한 스크롤 구현
+  const { ref, inView } = useInView({
+    threshold: 0,
+    rootMargin: "100px", // 하단 100px 전에 트리거
+  });
 
-  // 무한 스크롤 구현
   useEffect(() => {
-    const handleScroll = () => {
-      if (!containerRef.current || !hasNextPage || isFetchingNextPage) return;
-
-      const { scrollTop, scrollHeight, clientHeight } = containerRef.current;
-      // 스크롤이 하단 100px 이내에 도달하면 다음 페이지 로드
-      if (scrollTop + clientHeight >= scrollHeight - 100) {
-        onLoadMore();
-      }
-    };
-
-    const container = containerRef.current;
-    if (container) {
-      container.addEventListener("scroll", handleScroll);
-      return () => container.removeEventListener("scroll", handleScroll);
+    if (inView && hasNextPage && !isFetchingNextPage) {
+      onLoadMore();
     }
-  }, [hasNextPage, isFetchingNextPage, onLoadMore]);
+  }, [inView, hasNextPage, isFetchingNextPage, onLoadMore]);
 
   const columns = getColumns(onEdit, onDelete);
 
   return (
     <div
-      ref={containerRef}
       style={{
         maxHeight: "calc(100vh - 280px)",
         overflow: "auto",
       }}
     >
       <DataTable data={posts} columns={columns} showColumnToggle />
-      {isFetchingNextPage && (
-        <div style={{ textAlign: "center", padding: "16px" }}>로딩 중...</div>
+
+      {/* 무한 스크롤 트리거 영역 */}
+      {hasNextPage && (
+        <div
+          ref={ref}
+          style={{
+            padding: "16px",
+            textAlign: "center",
+          }}
+        >
+          {isFetchingNextPage ? "로딩 중..." : ""}
+        </div>
       )}
     </div>
   );

@@ -6,7 +6,7 @@ import { useRouter } from "next/navigation";
 import { App } from "antd";
 import { useMutation } from "@tanstack/react-query";
 import { useAuthStore } from "@/stores/auth-store";
-import { AuthQueries } from "@/modules/queries/auth-queries/quth-queries";
+import { AuthQueries } from "@/modules/queries/auth-queries";
 
 export function useLoginMutation() {
   const router = useRouter();
