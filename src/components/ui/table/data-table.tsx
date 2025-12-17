@@ -9,7 +9,7 @@
  * - Ant Design 스타일 적용
  */
 
-import { useState, useMemo, useCallback, useRef, useEffect } from "react";
+import { useState } from "react";
 import {
   useReactTable,
   getCoreRowModel,
@@ -17,9 +17,8 @@ import {
   ColumnDef,
   ColumnResizeMode,
   VisibilityState,
-  Header,
 } from "@tanstack/react-table";
-import { Table as AntTable, Checkbox, Dropdown, Button, Space } from "antd";
+import { Checkbox, Dropdown, Button } from "antd";
 import { SettingOutlined } from "@ant-design/icons";
 import type { MenuProps } from "antd";
 import styled from "styled-components";
