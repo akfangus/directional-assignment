@@ -41,7 +41,7 @@ function handleTokenExpired(): void {
  * Axios 인스턴스 생성
  */
 const apiClient: AxiosInstance = axios.create({
-  baseURL: process.env.NEXT_PUBLIC_API_URL || "/api",
+  baseURL: process.env.NEXT_PUBLIC_CORE_HOST,
   timeout: 30000,
   headers: {
     "Content-Type": "application/json",
