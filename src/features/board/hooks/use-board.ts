@@ -17,7 +17,7 @@ export function useBoard() {
   const [createModalOpen, setCreateModalOpen] = useState(false);
   const [editModalOpen, setEditModalOpen] = useState(false);
   const [deleteModalOpen, setDeleteModalOpen] = useState(false);
-  const [selectedPost, setSelectedPost] = useState<Post.Post | null>(null);
+  const [selectedPost, setSelectedPost] = useState<Board.Post | null>(null);
 
   // Mutations
   const { mutate: createPost, isPending: isCreating } = useMutation({
@@ -84,25 +84,25 @@ export function useBoard() {
     setCreateModalOpen(true);
   }, []);
 
-  const handleEditClick = useCallback((post: Post.Post) => {
+  const handleEditClick = useCallback((post: Board.Post) => {
     setSelectedPost(post);
     setEditModalOpen(true);
   }, []);
 
-  const handleDeleteClick = useCallback((post: Post.Post) => {
+  const handleDeleteClick = useCallback((post: Board.Post) => {
     setSelectedPost(post);
     setDeleteModalOpen(true);
   }, []);
 
   const handleCreateSubmit = useCallback(
-    (data: Post.CreateParams) => {
+    (data: Board.CreatePostParams) => {
       createPost(data);
     },
     [createPost]
   );
 
   const handleEditSubmit = useCallback(
-    (data: Post.UpdateParams) => {
+    (data: Board.UpdatePostParams) => {
       updatePost(data);
     },
     [updatePost]

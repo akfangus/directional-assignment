@@ -5,7 +5,7 @@
 import { useInfiniteQuery } from "@tanstack/react-query";
 import { PostQueries } from "@/modules/queries/post-queries";
 
-export function usePostsInfinite(params?: Omit<Post.ListParams, "cursor">) {
+export function usePostsInfinite(params?: Omit<Board.PostsParams, "cursor">) {
   return useInfiniteQuery({
     ...PostQueries.list(params),
     initialPageParam: undefined,

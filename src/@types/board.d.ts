@@ -7,7 +7,12 @@ declare namespace Board {
   /**
    * 게시글 카테고리
    */
-  type Category = "NOTICE" | "QNA" | "GENERAL";
+  type Category = "NOTICE" | "QNA" | "FREE";
+
+  /**
+   * 정렬 순서
+   */
+  type OrderType = "asc" | "desc";
 
   /**
    * 게시글 엔티티
@@ -28,6 +33,8 @@ declare namespace Board {
   interface PostsResponse {
     items: Post[];
     count: number;
+    nextCursor?: string;
+    prevCursor?: string;
   }
 
   /**
@@ -38,6 +45,9 @@ declare namespace Board {
     limit?: number;
     category?: Category;
     search?: string;
+    sort?: string;
+    order?: OrderType;
+    cursor?: string;
   }
 
   /**

@@ -10,9 +10,9 @@ const { TextArea } = Input;
 interface PostFormModalProps {
   open: boolean;
   mode: "create" | "edit";
-  initialData?: Post.Post;
+  initialData?: Board.Post;
   onCancel: () => void;
-  onSubmit: (data: Post.CreateParams) => void;
+  onSubmit: (data: Board.CreatePostParams) => void;
   loading?: boolean;
 }
 
@@ -24,7 +24,7 @@ export function PostFormModal({
   onSubmit,
   loading,
 }: PostFormModalProps): React.ReactElement {
-  const [formData, setFormData] = useState<Post.CreateParams>({
+  const [formData, setFormData] = useState<Board.CreatePostParams>({
     title: initialData?.title || "",
     body: initialData?.body || "",
     category: initialData?.category || "FREE",
@@ -38,10 +38,10 @@ export function PostFormModal({
   };
 
   const handleAddTag = () => {
-    if (tagInput.trim() && !formData.tags.includes(tagInput.trim())) {
+    if (tagInput.trim() && !(formData.tags ?? []).includes(tagInput.trim())) {
       setFormData((prev) => ({
         ...prev,
-        tags: [...prev.tags, tagInput.trim()],
+        tags: [...(prev.tags ?? []), tagInput.trim()],
       }));
       setTagInput("");
     }
@@ -50,7 +50,7 @@ export function PostFormModal({
   const handleRemoveTag = (tag: string) => {
     setFormData((prev) => ({
       ...prev,
-      tags: prev.tags.filter((t) => t !== tag),
+      tags: (prev.tags ?? []).filter((t) => t !== tag),
     }));
   };
 
@@ -103,7 +103,7 @@ export function PostFormModal({
 
         <Form.Item label="태그">
           <div style={{ marginBottom: 8 }}>
-            {formData.tags.map((tag) => (
+            {(formData.tags ?? []).map((tag) => (
               <Tag
                 key={tag}
                 closable

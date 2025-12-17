@@ -5,11 +5,11 @@
 import { useState, useCallback } from "react";
 
 interface UsePostFormProps {
-  initialData?: Post.Post;
+  initialData?: Board.Post;
 }
 
 export function usePostForm(props?: UsePostFormProps) {
-  const [formData, setFormData] = useState<Post.CreateParams>({
+  const [formData, setFormData] = useState<Board.CreatePostParams>({
     title: props?.initialData?.title || "",
     body: props?.initialData?.body || "",
     category: props?.initialData?.category || "FREE",
@@ -17,8 +17,8 @@ export function usePostForm(props?: UsePostFormProps) {
   });
 
   const handleChange = useCallback(
-    (field: keyof Post.CreateParams) =>
-      (value: string | string[] | "NOTICE" | "QNA" | "FREE") => {
+    (field: keyof Board.CreatePostParams) =>
+      (value: string | string[] | Board.Category) => {
         setFormData((prev) => ({ ...prev, [field]: value }));
       },
     []

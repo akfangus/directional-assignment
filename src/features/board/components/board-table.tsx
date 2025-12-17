@@ -10,18 +10,18 @@ import { DataTable } from "@/components/ui/table";
 import { format } from "date-fns";
 
 interface BoardTableProps {
-  posts: Post.Post[];
-  onEdit: (post: Post.Post) => void;
-  onDelete: (post: Post.Post) => void;
+  posts: Board.Post[];
+  onEdit: (post: Board.Post) => void;
+  onDelete: (post: Board.Post) => void;
   hasNextPage: boolean;
   isFetchingNextPage: boolean;
   onLoadMore: () => void;
 }
 
 const getColumns = (
-  onEdit: (post: Post.Post) => void,
-  onDelete: (post: Post.Post) => void
-): ColumnDef<Post.Post>[] => [
+  onEdit: (post: Board.Post) => void,
+  onDelete: (post: Board.Post) => void
+): ColumnDef<Board.Post>[] => [
   {
     accessorKey: "id",
     header: "ID",
@@ -40,9 +40,17 @@ const getColumns = (
     size: 100,
     minSize: 80,
     cell: ({ getValue }) => {
-      const category = getValue() as Post.Category;
-      const colorMap = { NOTICE: "blue", QNA: "orange", FREE: "green" };
-      const labelMap = { NOTICE: "공지사항", QNA: "Q&A", FREE: "자유게시판" };
+      const category = getValue() as Board.Category;
+      const colorMap: Record<Board.Category, string> = {
+        NOTICE: "blue",
+        QNA: "orange",
+        FREE: "green",
+      };
+      const labelMap: Record<Board.Category, string> = {
+        NOTICE: "공지사항",
+        QNA: "Q&A",
+        FREE: "자유게시판",
+      };
       return <Tag color={colorMap[category]}>{labelMap[category]}</Tag>;
     },
   },

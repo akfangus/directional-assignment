@@ -27,19 +27,21 @@ export function findForbiddenWords(text: string): string[] {
   return FORBIDDEN_WORDS.filter((word) => text.includes(word));
 }
 
+type ValidationResult = {
+  valid: boolean;
+  message?: string;
+};
+
 /**
  * 게시글 작성/수정 시 금칙어 검증
  * @param params 게시글 파라미터
  * @returns 금칙어가 포함되어 있지 않으면 true
  */
 export function validatePostParams(
-  params: Post.CreateParams | Post.UpdateParams
-): {
-  valid: boolean;
-  message?: string;
-} {
-  const titleWords = findForbiddenWords(params.title);
-  const bodyWords = findForbiddenWords(params.body);
+  params: Board.CreatePostParams | Board.UpdatePostParams
+): ValidationResult {
+  const titleWords = findForbiddenWords(params.title ?? "");
+  const bodyWords = findForbiddenWords(params.body ?? "");
 
   if (titleWords.length > 0) {
     return {

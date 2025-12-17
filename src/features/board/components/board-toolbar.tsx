@@ -11,12 +11,12 @@ const { Search } = Input;
 interface BoardToolbarProps {
   searchValue: string;
   sortValue: string;
-  orderValue: "asc" | "desc";
-  categoryValue?: "NOTICE" | "QNA" | "FREE";
+  orderValue: Board.OrderType;
+  categoryValue?: Board.Category;
   onSearchChange: (value: string) => void;
   onSortChange: (value: string) => void;
-  onOrderChange: (value: "asc" | "desc") => void;
-  onCategoryChange: (value?: "NOTICE" | "QNA" | "FREE") => void;
+  onOrderChange: (value: Board.OrderType) => void;
+  onCategoryChange: (value?: Board.Category) => void;
   onCreateClick: () => void;
 }
 

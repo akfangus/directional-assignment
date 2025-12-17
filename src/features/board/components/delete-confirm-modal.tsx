@@ -7,7 +7,7 @@ import { ExclamationCircleOutlined } from "@ant-design/icons";
 
 interface DeleteConfirmModalProps {
   open: boolean;
-  post: Post.Post | null;
+  post: Board.Post | null;
   onConfirm: () => void;
   onCancel: () => void;
   loading?: boolean;

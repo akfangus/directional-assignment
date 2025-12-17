@@ -17,10 +17,8 @@ export function BoardPage(): React.ReactElement {
   // 필터 상태
   const [search, setSearch] = useState("");
   const [sort, setSort] = useState<"title" | "createdAt">("createdAt");
-  const [order, setOrder] = useState<"asc" | "desc">("desc");
-  const [category, setCategory] = useState<
-    "NOTICE" | "QNA" | "FREE" | undefined
-  >();
+  const [order, setOrder] = useState<Board.OrderType>("desc");
+  const [category, setCategory] = useState<Board.Category | undefined>();
 
   // 데이터 조회
   const { data, fetchNextPage, hasNextPage, isFetchingNextPage, isLoading } =
