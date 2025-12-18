@@ -5,7 +5,7 @@
  * 레이아웃 구조만 담당, 메뉴 로직은 SidebarMenu에서 처리
  */
 
-import { SidebarMenu } from "@/components/ui/menu";
+import { AppSidebar } from "@/components/common/sidebar";
 import {
   StyledLayout,
   StyledSider,
@@ -30,7 +30,7 @@ export function SidebarLayout({
         <LogoContainer>
           <LogoTitle>{title}</LogoTitle>
         </LogoContainer>
-        <SidebarMenu />
+        <AppSidebar />
       </StyledSider>
       <ContentWrapper>
         <StyledContent>{children}</StyledContent>
