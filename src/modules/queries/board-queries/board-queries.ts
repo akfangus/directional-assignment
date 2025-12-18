@@ -11,7 +11,7 @@ import { BoardService } from "@/modules/service/board-service";
 import { getQueryClient } from "@/shared/libs/query-client";
 
 export class BoardQueries {
-  static readonly POSTS_LIMIT_PER_PAGE = 20;
+  static readonly POSTS_LIMIT_PER_PAGE = 10;
 
   static readonly keys = {
     root: ["board"] as const,

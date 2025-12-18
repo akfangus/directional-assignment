@@ -1,0 +1,23 @@
+@host = https://fe-hiring-rest-api.vercel.app
+@AccessToken = eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOiJjbWo2a2gzcHkwMDB1Yzl5djFia2dpeXJnIiwiZW1haWwiOiJha2ZhbmFrZmFuQG5hdmVyLmNvbSIsImlhdCI6MTc2NjAyMjIyMywiZXhwIjoxNzY2MTA4NjIzfQ.tALx8MzPvJyisePhe6AhWsjXjRT3sLvkZ6WhWcWPqtI
+@id = cmj6kh3py000uc9yv1bkgiyrg
+### POST 로그인
+POST {{host}}/auth/login
+Content-Type: application/json
+
+{
+  "email": "akfanakfan@naver.com",
+  "password": "R3pS4tQwU5"
+}
+
+### POST 게시글 작성
+POST {{host}}/posts
+Content-Type: application/json
+Authorization: Bearer {{AccessToken}}
+
+{
+    "title": "테스트 게시글",
+    "body": "테스트 게시글 내용",
+    "category": "NOTICE",   
+    "tags": ["테스트", "게시글"]
+}

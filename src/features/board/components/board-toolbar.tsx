@@ -14,6 +14,7 @@ interface BoardToolbarProps {
   orderValue: Board.OrderType;
   categoryValue?: Board.Category;
   onSearchChange: (value: string) => void;
+  onSearchSubmit: () => void;
   onSortChange: (value: string) => void;
   onOrderChange: (value: Board.OrderType) => void;
   onCategoryChange: (value?: Board.Category) => void;
@@ -26,6 +27,7 @@ export function BoardToolbar({
   orderValue,
   categoryValue,
   onSearchChange,
+  onSearchSubmit,
   onSortChange,
   onOrderChange,
   onCategoryChange,
@@ -38,7 +40,7 @@ export function BoardToolbar({
           placeholder="제목 또는 본문 검색"
           value={searchValue}
           onChange={(e) => onSearchChange(e.target.value)}
-          onSearch={onSearchChange}
+          onSearch={onSearchSubmit}
           style={{ width: 300 }}
           prefix={<SearchOutlined />}
         />

@@ -13,10 +13,16 @@ import { Spinner } from "@/components/ui/spinner";
 
 export function BoardPage(): React.ReactElement {
   // 필터 상태
-  const [search, setSearch] = useState("");
+  const [searchInput, setSearchInput] = useState(""); // 입력값 (로컬)
+  const [search, setSearch] = useState(""); // 실제 검색값 (API 호출)
   const [sort, setSort] = useState<"title" | "createdAt">("createdAt");
   const [order, setOrder] = useState<Board.OrderType>("desc");
   const [category, setCategory] = useState<Board.Category | undefined>();
+
+  // 검색 실행 핸들러
+  const handleSearch = () => {
+    setSearch(searchInput);
+  };
 
   const { data, fetchNextPage, hasNextPage, isFetchingNextPage, isLoading } =
     useInfiniteQuery(
@@ -58,11 +64,12 @@ export function BoardPage(): React.ReactElement {
   return (
     <Container>
       <BoardToolbar
-        searchValue={search}
+        searchValue={searchInput}
         sortValue={sort}
         orderValue={order}
         categoryValue={category}
-        onSearchChange={setSearch}
+        onSearchChange={setSearchInput}
+        onSearchSubmit={handleSearch}
         onSortChange={(value) => setSort(value as "title" | "createdAt")}
         onOrderChange={setOrder}
         onCategoryChange={setCategory}
