@@ -17,8 +17,8 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "Next.js Template",
-  description: "Next.js 15 + React 19 + TanStack Query + Zustand + Ant Design",
+  title: "Directional Assignment",
+  description: "Next.js 15 Assignment Project",
 };
 
 export default function RootLayout({
