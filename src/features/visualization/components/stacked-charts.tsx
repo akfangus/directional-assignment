@@ -9,7 +9,6 @@ import { useQuery } from "@tanstack/react-query";
 import { Row, Col, Typography } from "antd";
 import { ChartQueries } from "@/modules/queries/chart-queries";
 import { StackedBarChart, AreaChart } from "@/components/ui/chart";
-import { Spinner } from "@/components/ui/spinner";
 import { useMemo } from "react";
 
 const { Title } = Typography;
@@ -27,11 +26,9 @@ function convertToPercentage(data: Array<Record<string, any>>, keys: string[]) {
 }
 
 export function StackedCharts() {
-  // API 데이터 fetching
-  const { data: moodData, isLoading: isMoodLoading } = useQuery(
-    ChartQueries.queryWeeklyMoodTrend()
-  );
-  const { data: workoutData, isLoading: isWorkoutLoading } = useQuery(
+  // API 데이터 fetching (레이아웃에서 prefetch됨)
+  const { data: moodData } = useQuery(ChartQueries.queryWeeklyMoodTrend());
+  const { data: workoutData } = useQuery(
     ChartQueries.queryWeeklyWorkoutTrend()
   );
 
@@ -51,10 +48,6 @@ export function StackedCharts() {
         : [],
     [workoutData]
   );
-
-  if (isMoodLoading || isWorkoutLoading) {
-    return <Spinner />;
-  }
 
   return (
     <>
