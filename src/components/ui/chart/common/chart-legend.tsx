@@ -25,31 +25,34 @@ export function ChartLegend({
   return (
     <Space wrap style={{ marginTop: 16 }}>
       {dataKeys.map((key) => (
-        <Checkbox
-          key={key}
-          checked={!hiddenKeys.has(key)}
-          onChange={() => onToggle(key)}
-        >
-          <Space size={8}>
-            {/* 색상 인디케이터 */}
-            <div
-              style={{
-                width: 12,
-                height: 12,
-                backgroundColor: colors[key],
-                borderRadius: 2,
-              }}
-            />
-            {/* 라벨 */}
-            <span>{labels?.[key] || key}</span>
-            {/* 색상 피커 */}
-            <ColorPicker
-              size="small"
-              value={colors[key]}
-              onChange={(color) => onColorChange(key, color.toHexString())}
-            />
-          </Space>
-        </Checkbox>
+        <Space key={key} size={4} align="center">
+          {/* 체크박스 + 색상 인디케이터 + 라벨 */}
+          <Checkbox
+            checked={!hiddenKeys.has(key)}
+            onChange={() => onToggle(key)}
+          >
+            <Space size={8}>
+              {/* 색상 인디케이터 */}
+              <div
+                style={{
+                  width: 12,
+                  height: 12,
+                  backgroundColor: colors[key],
+                  borderRadius: 2,
+                }}
+              />
+              {/* 라벨 */}
+              <span>{labels?.[key] || key}</span>
+            </Space>
+          </Checkbox>
+
+          {/* 색상 피커 - Checkbox 외부에 독립적으로 배치 */}
+          <ColorPicker
+            size="small"
+            value={colors[key]}
+            onChange={(color) => onColorChange(key, color.toHexString())}
+          />
+        </Space>
       ))}
     </Space>
   );

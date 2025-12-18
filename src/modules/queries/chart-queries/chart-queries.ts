@@ -30,7 +30,7 @@ export class ChartQueries {
     return {
       queryKey: this.keys.topCoffeeBrands(),
       queryFn: () => ChartService.fetchTopCoffeeBrands(),
-      staleTime: 1000 * 60 * 5, // 5분
+      staleTime: Infinity, // 수동 무효화 전까지 캐시 유지
       gcTime: 1000 * 60 * 30, // 30분
     };
   }
@@ -42,7 +42,7 @@ export class ChartQueries {
     return {
       queryKey: this.keys.popularSnackBrands(),
       queryFn: () => ChartService.fetchPopularSnackBrands(),
-      staleTime: 1000 * 60 * 5, // 5분
+      staleTime: Infinity, // 수동 무효화 전까지 캐시 유지
       gcTime: 1000 * 60 * 30, // 30분
     };
   }
@@ -54,7 +54,7 @@ export class ChartQueries {
     return {
       queryKey: this.keys.weeklyMoodTrend(),
       queryFn: () => ChartService.fetchWeeklyMoodTrend(),
-      staleTime: 1000 * 60 * 5, // 5분
+      staleTime: Infinity, // 수동 무효화 전까지 캐시 유지
       gcTime: 1000 * 60 * 30, // 30분
     };
   }
@@ -66,7 +66,7 @@ export class ChartQueries {
     return {
       queryKey: this.keys.weeklyWorkoutTrend(),
       queryFn: () => ChartService.fetchWeeklyWorkoutTrend(),
-      staleTime: 1000 * 60 * 5, // 5분
+      staleTime: Infinity, // 수동 무효화 전까지 캐시 유지
       gcTime: 1000 * 60 * 30, // 30분
     };
   }
@@ -78,7 +78,7 @@ export class ChartQueries {
     return {
       queryKey: this.keys.coffeeConsumption(),
       queryFn: () => ChartService.fetchCoffeeConsumption(),
-      staleTime: 1000 * 60 * 5, // 5분
+      staleTime: Infinity, // 수동 무효화 전까지 캐시 유지
       gcTime: 1000 * 60 * 30, // 30분
     };
   }
@@ -90,7 +90,7 @@ export class ChartQueries {
     return {
       queryKey: this.keys.snackImpact(),
       queryFn: () => ChartService.fetchSnackImpact(),
-      staleTime: 1000 * 60 * 5, // 5분
+      staleTime: Infinity, // 수동 무효화 전까지 캐시 유지
       gcTime: 1000 * 60 * 30, // 30분
     };
   }
