@@ -89,9 +89,39 @@ yarn dev
 ### 데이터 시각화 ( /visualization/[chartName] )
 
 - **구현 프로세스**:
+
   - **Recharts 도입**: Recharts를 선택하여 대시보드를 구현했습니다.
 
-## 4. 배포 링크
+  -
+
+## 4. 프로젝트 구조
+
+## 4. 프로젝트 구조
+
+```
+src
+├── app                  # Next.js App Router
+│   ├── (auth)          # 인증이 필요한 라우트 그룹 (Layout 포함)
+│   └── login           # 로그인 페이지
+├── components           # 공통 UI 컴포넌트
+│   ├── common          # 범용 컴포넌트 (Header, Sidebar 등)
+│   ├── layout          # 레이아웃 관련 컴포넌트
+│   └── ui              # 공통 디자인 시스템 컴포넌트 (Button, Input 등)
+├── features             # 도메인별 기능 단위 (페이지 로직 포함)
+│   ├── board           # 게시판 기능 (components, hooks, types)
+│   ├── login           # 로그인 기능 (form, hooks)
+│   └── visualization   # 차트/시각화 기능
+├── modules              # 비즈니스 로직 및 데이터 계층
+│   ├── queries         # React Query 훅 모음 (API 통신)
+│   └── service         # API 호출 함수 및 매퍼
+├── shared               # 공통 유틸리티 및 설정
+│   ├── apis            # API 인스턴스 설정
+│   └── libs            # 외부 라이브러리 설정 (Axios, QueryClient 등)
+├── stores               # 전역 상태 관리 (Zustand)
+└── theme                # 스타일 테마 및 설정 (Color, Font)
+```
+
+## 5. 배포 링크
 
 현재 배포된 애플리케이션은 아래 링크에서 확인하실 수 있습니다.
 
