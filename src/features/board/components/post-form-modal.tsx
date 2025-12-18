@@ -3,14 +3,16 @@
  */
 
 import { Modal, Form, Input, Select, Tag } from "antd";
-import { useState } from "react";
+import { useState, useEffect } from "react";
+import { useQuery } from "@tanstack/react-query";
+import { BoardQueries } from "@/modules/queries/board-queries";
 
 const { TextArea } = Input;
 
 interface PostFormModalProps {
   open: boolean;
   mode: "create" | "edit";
-  initialData?: Board.Post;
+  postId?: string;
   onCancel: () => void;
   onSubmit: (data: Board.CreatePostParams) => void;
   loading?: boolean;
@@ -19,19 +21,50 @@ interface PostFormModalProps {
 export function PostFormModal({
   open,
   mode,
-  initialData,
+  postId,
   onCancel,
   onSubmit,
   loading,
 }: PostFormModalProps): React.ReactElement {
   const [formData, setFormData] = useState<Board.CreatePostParams>({
-    title: initialData?.title || "",
-    body: initialData?.body || "",
-    category: initialData?.category || "FREE",
-    tags: initialData?.tags || [],
+    title: "",
+    body: "",
+    category: "FREE",
+    tags: [],
   });
 
   const [tagInput, setTagInput] = useState("");
+
+  // 수정 모드일 때만 게시글 상세 조회
+  const { data: post, isLoading: isLoadingPost } = useQuery({
+    ...BoardQueries.queryPost(postId!),
+    enabled: mode === "edit" && !!postId && open,
+  });
+
+  // 모달이 열릴 때 폼 초기화 또는 데이터 로드
+  useEffect(() => {
+    if (open) {
+      if (mode === "create") {
+        // 생성 모드: 폼 초기화
+        setFormData({
+          title: "",
+          body: "",
+          category: "FREE",
+          tags: [],
+        });
+        setTagInput("");
+      } else if (mode === "edit" && post) {
+        // 수정 모드: 불러온 데이터로 폼 채우기
+        setFormData({
+          title: post.title,
+          body: post.body,
+          category: post.category,
+          tags: post.tags,
+        });
+        setTagInput("");
+      }
+    }
+  }, [open, mode, post]);
 
   const handleSubmit = () => {
     onSubmit(formData);
@@ -73,6 +106,7 @@ export function PostFormModal({
               setFormData((prev) => ({ ...prev, title: e.target.value }))
             }
             placeholder="제목을 입력하세요"
+            disabled={isLoadingPost}
           />
         </Form.Item>
 
@@ -87,6 +121,7 @@ export function PostFormModal({
               { label: "Q&A", value: "QNA" },
               { label: "자유게시판", value: "FREE" },
             ]}
+            disabled={isLoadingPost}
           />
         </Form.Item>
 
@@ -98,6 +133,7 @@ export function PostFormModal({
             }
             placeholder="본문을 입력하세요"
             rows={6}
+            disabled={isLoadingPost}
           />
         </Form.Item>
 
@@ -119,8 +155,15 @@ export function PostFormModal({
             onChange={(e) => setTagInput(e.target.value)}
             onPressEnter={handleAddTag}
             placeholder="태그 입력 후 Enter"
+            disabled={isLoadingPost}
           />
         </Form.Item>
+
+        {isLoadingPost && (
+          <div style={{ textAlign: "center", padding: "20px", color: "#999" }}>
+            게시글 데이터를 불러오는 중...
+          </div>
+        )}
       </Form>
     </Modal>
   );

@@ -107,7 +107,7 @@ export function BoardPage(): React.ReactElement {
       <PostFormModal
         open={editModalOpen}
         mode="edit"
-        initialData={selectedPost || undefined}
+        postId={selectedPost?.id}
         onCancel={handleModalCancel}
         onSubmit={handleEditSubmit}
         loading={isUpdating}
