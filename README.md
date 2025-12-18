@@ -90,10 +90,9 @@ yarn dev
 - **구현 프로세스**:
 
   - **Recharts 도입**: Recharts를 선택하여 대시보드를 구현했습니다.
-
-  -
-
-## 4. 프로젝트 구조
+  - **최적화 포인트**:
+    - **SSR 데이터 프리패칭**: `VisualizationLayout`에서 `QueryClient`와 `prefetchQuery`를 사용하여 차트 데이터를 서버 사이드에서 미리 가져오도록 설계
+    - **하이드레이션 구현**: 서버에서 프리패치된 데이터를 `dehydrate`하여 클라이언트로 전달하고, `VisualizationProvider`를 통해 하이드레이션하여 초기 렌더링 속도를 증가시켰습니다.
 
 ## 4. 프로젝트 구조
 
