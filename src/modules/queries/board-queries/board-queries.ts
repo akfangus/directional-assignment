@@ -18,8 +18,9 @@ export class BoardQueries {
     posts: () => [...this.keys.root, "posts"] as const,
     postsList: (params: Board.PostsParams) =>
       [...this.keys.posts(), params] as const,
-    postsInfinite: (params: Omit<Board.PostsParams, "page">) =>
-      [...this.keys.posts(), "infinite", params] as const,
+    postsInfinite: (
+      params: Omit<Board.PostsParams, "nextCursor" | "prevCursor">
+    ) => [...this.keys.posts(), "infinite", params] as const,
     post: (id: string) => [...this.keys.root, "post", id] as const,
   };
 
@@ -40,19 +41,32 @@ export class BoardQueries {
   }
 
   /**
-   * 게시글 목록 조회 (무한 스크롤)
+   * 게시글 목록 조회 (양방향 무한 스크롤)
    */
   static queryInfinitePosts(
     params: Omit<Board.PostsParams, "nextCursor" | "prevCursor"> = {}
   ) {
     return {
       queryKey: this.keys.postsInfinite(params),
-      queryFn: async ({ pageParam }: { pageParam?: string }) =>
-        BoardService.fetchPosts({
+      queryFn: async ({
+        pageParam,
+        direction,
+      }: {
+        pageParam?: string;
+        direction: "forward" | "backward";
+      }) => {
+        // direction에 따라 nextCursor 또는 prevCursor 사용
+        const cursorParams =
+          direction === "backward"
+            ? { prevCursor: pageParam }
+            : { nextCursor: pageParam };
+
+        return BoardService.fetchPosts({
           ...params,
           limit: this.POSTS_LIMIT_PER_PAGE,
-          nextCursor: pageParam,
-        }),
+          ...cursorParams,
+        });
+      },
       initialPageParam: undefined as string | undefined,
       getNextPageParam: (lastPage: Board.PostsResponse) =>
         lastPage.nextCursor ?? undefined,
@@ -83,8 +97,11 @@ export class BoardQueries {
     return {
       mutationFn: (params) => BoardService.createPost(params),
       onSuccess: () => {
-        // 생성 성공 시 게시글 목록 자동 무효화
-        this.invalidate.posts();
+        // 생성 성공 시 게시글 목록 즉시 다시 불러오기
+        const queryClient = getQueryClient();
+        queryClient.refetchQueries({
+          queryKey: this.keys.posts(),
+        });
       },
     };
   }
@@ -100,9 +117,17 @@ export class BoardQueries {
     return {
       mutationFn: ({ id, params }) => BoardService.updatePost(id, params),
       onSuccess: (data, variables) => {
-        // 수정 성공 시 해당 게시글 상세와 목록 자동 무효화
-        this.invalidate.post(variables.id);
-        this.invalidate.posts();
+        const queryClient = getQueryClient();
+
+        // 수정된 게시글 상세 쿼리 캐시에서 제거 (다음 조회 시 새로 불러오도록)
+        queryClient.removeQueries({
+          queryKey: this.keys.post(variables.id),
+        });
+
+        // 게시글 목록 즉시 다시 불러오기
+        queryClient.refetchQueries({
+          queryKey: this.keys.posts(),
+        });
       },
     };
   }
@@ -113,9 +138,18 @@ export class BoardQueries {
   static mutationDeletePost(): UseMutationOptions<void, Error, string> {
     return {
       mutationFn: (id) => BoardService.deletePost(id),
-      onSuccess: () => {
-        // 삭제 성공 시 게시글 목록 자동 무효화
-        this.invalidate.posts();
+      onSuccess: (data, id) => {
+        const queryClient = getQueryClient();
+
+        // 삭제된 게시글 상세 쿼리 캐시에서 완전히 제거
+        queryClient.removeQueries({
+          queryKey: this.keys.post(id),
+        });
+
+        // 게시글 목록 즉시 다시 불러오기
+        queryClient.refetchQueries({
+          queryKey: this.keys.posts(),
+        });
       },
     };
   }
@@ -127,10 +161,14 @@ export class BoardQueries {
   static invalidate = {
     /**
      * 게시글 목록 무효화 (모든 params)
+     * 무한 스크롤 쿼리도 포함하여 모든 페이지를 다시 불러옵니다
      */
     posts: () => {
       const queryClient = getQueryClient();
-      return queryClient.invalidateQueries({ queryKey: this.keys.posts() });
+      return queryClient.invalidateQueries({
+        queryKey: this.keys.posts(),
+        refetchType: "all", // 모든 페이지 다시 불러오기
+      });
     },
 
     /**
@@ -138,7 +176,9 @@ export class BoardQueries {
      */
     post: (id: string) => {
       const queryClient = getQueryClient();
-      return queryClient.invalidateQueries({ queryKey: this.keys.post(id) });
+      return queryClient.invalidateQueries({
+        queryKey: this.keys.post(id),
+      });
     },
 
     /**
@@ -146,7 +186,10 @@ export class BoardQueries {
      */
     all: () => {
       const queryClient = getQueryClient();
-      return queryClient.invalidateQueries({ queryKey: this.keys.root });
+      return queryClient.invalidateQueries({
+        queryKey: this.keys.root,
+        refetchType: "all",
+      });
     },
   };
 }

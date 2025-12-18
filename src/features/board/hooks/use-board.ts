@@ -8,6 +8,7 @@ import { useMutation } from "@tanstack/react-query";
 import { App } from "antd";
 import { BoardQueries } from "@/modules/queries/board-queries";
 import { validatePostParams } from "../utils/forbidden-words";
+import { getQueryClient } from "@/shared/libs/query-client";
 
 export function useBoard() {
   const { message } = App.useApp();
@@ -28,15 +29,17 @@ export function useBoard() {
         throw new Error(validation.message);
       }
     },
-    onSuccess: () => {
-      // 쿼리 무효화는 BoardQueries에서 자동 처리
+    // BoardQueries의 onSuccess가 먼저 실행되고, 그 다음 onSettled가 실행됨
+    onSettled: (data, error) => {
+      if (error) {
+        if (!error.message.includes("금칙어")) {
+          message.error("게시글 작성에 실패했습니다");
+        }
+        return;
+      }
+
       message.success("게시글이 작성되었습니다");
       setCreateModalOpen(false);
-    },
-    onError: (error: Error) => {
-      if (!error.message.includes("금칙어")) {
-        message.error("게시글 작성에 실패했습니다");
-      }
     },
   });
 
@@ -49,29 +52,33 @@ export function useBoard() {
         throw new Error(validation.message);
       }
     },
-    onSuccess: () => {
-      // 쿼리 무효화는 BoardQueries에서 자동 처리
+    // BoardQueries의 onSuccess가 먼저 실행되고, 그 다음 onSettled가 실행됨
+    onSettled: (data, error) => {
+      if (error) {
+        if (!error.message.includes("금칙어")) {
+          message.error("게시글 수정에 실패했습니다");
+        }
+        return;
+      }
+
       message.success("게시글이 수정되었습니다");
       setEditModalOpen(false);
       setSelectedPost(null);
-    },
-    onError: (error: Error) => {
-      if (!error.message.includes("금칙어")) {
-        message.error("게시글 수정에 실패했습니다");
-      }
     },
   });
 
   const { mutate: deletePost, isPending: isDeleting } = useMutation({
     ...BoardQueries.mutationDeletePost(),
-    onSuccess: () => {
-      // 쿼리 무효화는 BoardQueries에서 자동 처리
+    // BoardQueries의 onSuccess가 먼저 실행되고, 그 다음 onSettled가 실행됨
+    onSettled: (data, error) => {
+      if (error) {
+        message.error("게시글 삭제에 실패했습니다");
+        return;
+      }
+
       message.success("게시글이 삭제되었습니다");
       setDeleteModalOpen(false);
       setSelectedPost(null);
-    },
-    onError: () => {
-      message.error("게시글 삭제에 실패했습니다");
     },
   });
 
