@@ -45,19 +45,17 @@ export function useBoard() {
 
   const { mutate: updatePost, isPending: isUpdating } = useMutation({
     ...BoardQueries.mutationUpdatePost(),
-    onMutate: ({ params }) => {
-      const validation = validatePostParams(params);
+    // BoardQueries의 onMutate, onError, onSuccess가 먼저 실행되고, 그 다음 onSettled가 실행됨
+    onSettled: (data, error, variables) => {
+      // 금칙어 에러는 mutation 전에 처리
+      const validation = validatePostParams(variables.params);
       if (!validation.valid) {
         message.error(validation.message);
-        throw new Error(validation.message);
+        return;
       }
-    },
-    // BoardQueries의 onSuccess가 먼저 실행되고, 그 다음 onSettled가 실행됨
-    onSettled: (data, error) => {
+
       if (error) {
-        if (!error.message.includes("금칙어")) {
-          message.error("게시글 수정에 실패했습니다");
-        }
+        message.error("게시글 수정에 실패했습니다");
         return;
       }
 

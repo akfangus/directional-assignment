@@ -107,48 +107,120 @@ export class BoardQueries {
   }
 
   /**
-   * 게시글 수정 Mutation
+   * 게시글 수정 Mutation (낙관적 업데이트)
    */
   static mutationUpdatePost(): UseMutationOptions<
     Board.Post,
     Error,
-    { id: string; params: Board.UpdatePostParams }
+    { id: string; params: Board.UpdatePostParams },
+    { previousData: unknown }
   > {
     return {
       mutationFn: ({ id, params }) => BoardService.updatePost(id, params),
-      onSuccess: (data, variables) => {
+      onMutate: async ({ id, params }) => {
         const queryClient = getQueryClient();
 
-        // 수정된 게시글 상세 쿼리 캐시에서 제거 (다음 조회 시 새로 불러오도록)
-        queryClient.removeQueries({
-          queryKey: this.keys.post(variables.id),
+        // 1. 진행 중인 refetch 취소
+        await queryClient.cancelQueries({ queryKey: this.keys.posts() });
+
+        // 2. 현재 캐시 스냅샷 저장 (롤백용)
+        const previousData = queryClient.getQueriesData({
+          queryKey: this.keys.posts(),
         });
 
-        // 게시글 목록 즉시 다시 불러오기
-        queryClient.refetchQueries({
-          queryKey: this.keys.posts(),
+        // 3. 모든 무한 스크롤 쿼리를 낙관적으로 업데이트
+        queryClient.setQueriesData<{
+          pages: Board.PostsResponse[];
+          pageParams: unknown[];
+        }>({ queryKey: this.keys.posts() }, (old) => {
+          if (!old) return old;
+
+          return {
+            ...old,
+            pages: old.pages.map((page) => ({
+              ...page,
+              items: page.items.map((post) =>
+                post.id === id ? { ...post, ...params } : post
+              ),
+            })),
+          };
+        });
+
+        return { previousData };
+      },
+      onError: (_err, _variables, context) => {
+        // 실패 시 롤백
+        if (context?.previousData && Array.isArray(context.previousData)) {
+          const queryClient = getQueryClient();
+          context.previousData.forEach(([queryKey, data]: [any, any]) => {
+            queryClient.setQueryData(queryKey, data);
+          });
+        }
+      },
+      onSuccess: (_data, variables) => {
+        // 상세 캐시 제거 (다음 조회 시 새로 불러오도록)
+        const queryClient = getQueryClient();
+        queryClient.removeQueries({
+          queryKey: this.keys.post(variables.id),
         });
       },
     };
   }
 
   /**
-   * 게시글 삭제 Mutation
+   * 게시글 삭제 Mutation (낙관적 업데이트)
    */
-  static mutationDeletePost(): UseMutationOptions<void, Error, string> {
+  static mutationDeletePost(): UseMutationOptions<
+    void,
+    Error,
+    string,
+    { previousData: unknown }
+  > {
     return {
       mutationFn: (id) => BoardService.deletePost(id),
-      onSuccess: (data, id) => {
+      onMutate: async (id) => {
         const queryClient = getQueryClient();
 
-        // 삭제된 게시글 상세 쿼리 캐시에서 완전히 제거
-        queryClient.removeQueries({
-          queryKey: this.keys.post(id),
+        // 1. 진행 중인 refetch 취소
+        await queryClient.cancelQueries({ queryKey: this.keys.posts() });
+
+        // 2. 현재 캐시 스냅샷 저장 (롤백용)
+        const previousData = queryClient.getQueriesData({
+          queryKey: this.keys.posts(),
         });
 
-        // 게시글 목록 즉시 다시 불러오기
-        queryClient.refetchQueries({
-          queryKey: this.keys.posts(),
+        // 3. 모든 무한 스크롤 쿼리에서 낙관적으로 삭제
+        queryClient.setQueriesData<{
+          pages: Board.PostsResponse[];
+          pageParams: unknown[];
+        }>({ queryKey: this.keys.posts() }, (old) => {
+          if (!old) return old;
+
+          return {
+            ...old,
+            pages: old.pages.map((page) => ({
+              ...page,
+              items: page.items.filter((post) => post.id !== id),
+            })),
+          };
+        });
+
+        return { previousData };
+      },
+      onError: (_err, _id, context) => {
+        // 실패 시 롤백
+        if (context?.previousData && Array.isArray(context.previousData)) {
+          const queryClient = getQueryClient();
+          context.previousData.forEach(([queryKey, data]: [any, any]) => {
+            queryClient.setQueryData(queryKey, data);
+          });
+        }
+      },
+      onSuccess: (_data, id) => {
+        // 상세 캐시 제거
+        const queryClient = getQueryClient();
+        queryClient.removeQueries({
+          queryKey: this.keys.post(id),
         });
       },
     };
