@@ -9,14 +9,19 @@ import { useQuery } from "@tanstack/react-query";
 import { Row, Col, Typography } from "antd";
 import { ChartQueries } from "@/modules/queries/chart-queries";
 import { BarChart, PieChart } from "@/components/ui/chart";
+import { Spinner } from "@/components/ui/spinner";
 import { useMemo } from "react";
 
 const { Title } = Typography;
 
 export function BarDonutCharts() {
   // API 데이터 fetching
-  const { data: moodData } = useQuery(ChartQueries.queryWeeklyMoodTrend());
-  const { data: snackData } = useQuery(ChartQueries.queryPopularSnackBrands());
+  const { data: moodData, isLoading: isMoodLoading } = useQuery(
+    ChartQueries.queryWeeklyMoodTrend()
+  );
+  const { data: snackData, isLoading: isSnackLoading } = useQuery(
+    ChartQueries.queryPopularSnackBrands()
+  );
 
   // 도넛 차트용 데이터 변환
   const moodPieData = useMemo(() => {
@@ -45,9 +50,12 @@ export function BarDonutCharts() {
     [snackData]
   );
 
+  if (isMoodLoading || isSnackLoading) {
+    return <Spinner />;
+  }
+
   return (
     <>
-      {/* weekly-mood-trend: 바 + 도넛 */}
       <Title level={3} style={{ marginTop: 32 }}>
         😊 주간 무드 트렌드
       </Title>
@@ -66,7 +74,6 @@ export function BarDonutCharts() {
         </Col>
       </Row>
 
-      {/* popular-snack-brands: 바 + 도넛 */}
       <Title level={3} style={{ marginTop: 48 }}>
         🍪 간식 브랜드 점유율
       </Title>

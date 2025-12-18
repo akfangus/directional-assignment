@@ -9,6 +9,7 @@ import { useQuery } from "@tanstack/react-query";
 import { Row, Col, Typography } from "antd";
 import { ChartQueries } from "@/modules/queries/chart-queries";
 import { StackedBarChart, AreaChart } from "@/components/ui/chart";
+import { Spinner } from "@/components/ui/spinner";
 import { useMemo } from "react";
 
 const { Title } = Typography;
@@ -27,8 +28,10 @@ function convertToPercentage(data: Array<Record<string, any>>, keys: string[]) {
 
 export function StackedCharts() {
   // API 데이터 fetching
-  const { data: moodData } = useQuery(ChartQueries.queryWeeklyMoodTrend());
-  const { data: workoutData } = useQuery(
+  const { data: moodData, isLoading: isMoodLoading } = useQuery(
+    ChartQueries.queryWeeklyMoodTrend()
+  );
+  const { data: workoutData, isLoading: isWorkoutLoading } = useQuery(
     ChartQueries.queryWeeklyWorkoutTrend()
   );
 
@@ -49,9 +52,12 @@ export function StackedCharts() {
     [workoutData]
   );
 
+  if (isMoodLoading || isWorkoutLoading) {
+    return <Spinner />;
+  }
+
   return (
     <>
-      {/* weekly-mood-trend: 스택형 바 + 면적 (%) */}
       <Title level={3} style={{ marginTop: 32 }}>
         😊 주간 무드 트렌드
       </Title>
@@ -85,7 +91,6 @@ export function StackedCharts() {
         </Col>
       </Row>
 
-      {/* weekly-workout-trend: 스택형 바 + 면적 (%) */}
       <Title level={3} style={{ marginTop: 48 }}>
         🏃 주간 운동 트렌드
       </Title>
