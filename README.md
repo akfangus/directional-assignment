@@ -50,7 +50,6 @@ yarn dev
 
 ### UI & 스타일
 
-- **CSS Framework**: TailwindCSS
 - **CSS-in-JS**: Styled Components
 - **UI Library**: Ant Design
 
