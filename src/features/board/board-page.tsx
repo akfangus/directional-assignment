@@ -46,18 +46,23 @@ export function BoardPage(): React.ReactElement {
   const {
     createModalOpen,
     editModalOpen,
+    viewModalOpen,
     deleteModalOpen,
     selectedPost,
     isCreating,
     isUpdating,
     isDeleting,
     handleCreateClick,
+    handleViewClick,
     handleEditClick,
     handleDeleteClick,
-    handleCreateSubmit,
-    handleEditSubmit,
-    handleDeleteConfirm,
-    handleModalCancel,
+    onCreateModalClose,
+    onEditModalClose,
+    onViewModalClose,
+    onDeleteModalClose,
+    createPost,
+    updatePost,
+    deletePost,
   } = useBoard();
 
   // 전체 게시글 목록
@@ -86,6 +91,7 @@ export function BoardPage(): React.ReactElement {
 
       <BoardTable
         posts={posts}
+        onView={handleViewClick}
         onEdit={handleEditClick}
         onDelete={handleDeleteClick}
         hasNextPage={!!hasNextPage}
@@ -99,25 +105,33 @@ export function BoardPage(): React.ReactElement {
       <PostFormModal
         open={createModalOpen}
         mode="create"
-        onCancel={handleModalCancel}
-        onSubmit={handleCreateSubmit}
+        onCancel={onCreateModalClose}
+        onSubmit={createPost}
         loading={isCreating}
+      />
+
+      <PostFormModal
+        open={viewModalOpen}
+        mode="view"
+        postId={selectedPost?.id}
+        onCancel={onViewModalClose}
+        onSubmit={() => {}}
       />
 
       <PostFormModal
         open={editModalOpen}
         mode="edit"
         postId={selectedPost?.id}
-        onCancel={handleModalCancel}
-        onSubmit={handleEditSubmit}
+        onCancel={onEditModalClose}
+        onSubmit={(data) => updatePost({ id: selectedPost!.id, params: data })}
         loading={isUpdating}
       />
 
       <DeleteConfirmModal
         open={deleteModalOpen}
         post={selectedPost}
-        onConfirm={handleDeleteConfirm}
-        onCancel={handleModalCancel}
+        onConfirm={() => selectedPost && deletePost(selectedPost.id)}
+        onCancel={onDeleteModalClose}
         loading={isDeleting}
       />
     </Container>

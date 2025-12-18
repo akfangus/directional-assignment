@@ -14,6 +14,7 @@ import {
   EditOutlined,
   DeleteOutlined,
   SettingOutlined,
+  EyeOutlined,
 } from "@ant-design/icons";
 import type { ColumnsType, ColumnType } from "antd/es/table";
 import type { MenuProps } from "antd";
@@ -25,6 +26,7 @@ import { useAuthStore } from "@/stores/auth-store";
 
 interface BoardTableProps {
   posts: Board.Post[];
+  onView: (post: Board.Post) => void;
   onEdit: (post: Board.Post) => void;
   onDelete: (post: Board.Post) => void;
   hasNextPage: boolean;
@@ -83,6 +85,7 @@ const StyledTableWrapper = styled.div`
 
 export function BoardTable({
   posts,
+  onView,
   onEdit,
   onDelete,
   hasNextPage,
@@ -153,26 +156,36 @@ export function BoardTable({
       key: "actions",
       width: 150,
       render: (_: unknown, post: Board.Post) => {
-        // 현재 사용자와 게시글 작성자가 일치하는 경우에만 버튼 표시
-        if (user?.id !== post.userId) {
-          return null;
-        }
+        const isOwner = user?.id === post.userId;
 
         return (
           <Space>
             <Button
               type="link"
               size="small"
-              icon={<EditOutlined />}
-              onClick={() => onEdit(post)}
+              icon={<EyeOutlined style={{ color: "#52c41a" }} />}
+              onClick={() => onView(post)}
+              title="상세 보기"
             />
-            <Button
-              type="link"
-              size="small"
-              danger
-              icon={<DeleteOutlined />}
-              onClick={() => onDelete(post)}
-            />
+            {isOwner && (
+              <>
+                <Button
+                  type="link"
+                  size="small"
+                  icon={<EditOutlined />}
+                  onClick={() => onEdit(post)}
+                  title="수정"
+                />
+                <Button
+                  type="link"
+                  size="small"
+                  danger
+                  icon={<DeleteOutlined />}
+                  onClick={() => onDelete(post)}
+                  title="삭제"
+                />
+              </>
+            )}
           </Space>
         );
       },

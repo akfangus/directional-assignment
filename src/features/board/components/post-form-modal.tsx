@@ -2,7 +2,7 @@
  * PostFormModal - 게시글 작성/수정 모달
  */
 
-import { Modal, Form, Input, Select, Tag } from "antd";
+import { Modal, Form, Input, Select, Tag, Button } from "antd";
 import { useState, useEffect } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { BoardQueries } from "@/modules/queries/board-queries";
@@ -11,7 +11,7 @@ const { TextArea } = Input;
 
 interface PostFormModalProps {
   open: boolean;
-  mode: "create" | "edit";
+  mode: "create" | "edit" | "view";
   postId?: string;
   onCancel: () => void;
   onSubmit: (data: Board.CreatePostParams) => void;
@@ -53,8 +53,8 @@ export function PostFormModal({
           tags: [],
         });
         setTagInput("");
-      } else if (mode === "edit" && post) {
-        // 수정 모드: 불러온 데이터로 폼 채우기
+      } else if ((mode === "edit" || mode === "view") && post) {
+        // 수정/보기 모드: 불러온 데이터로 폼 채우기
         setFormData({
           title: post.title,
           body: post.body,
@@ -87,54 +87,101 @@ export function PostFormModal({
     }));
   };
 
+  const isReadOnly = mode === "view";
+  const modalTitle =
+    mode === "create"
+      ? "새 글 작성"
+      : mode === "view"
+      ? "게시글 상세"
+      : "게시글 수정";
+  const okText = mode === "create" ? "작성" : mode === "view" ? "확인" : "수정";
+
   return (
     <Modal
       open={open}
-      title={mode === "create" ? "새 글 작성" : "게시글 수정"}
+      title={modalTitle}
       onCancel={onCancel}
-      onOk={handleSubmit}
-      okText={mode === "create" ? "작성" : "수정"}
-      cancelText="취소"
+      onOk={mode === "view" ? onCancel : handleSubmit}
+      okText={okText}
+      cancelText={mode === "view" ? undefined : "취소"}
       confirmLoading={loading}
       width={600}
+      footer={
+        mode === "view"
+          ? [
+              <Button key="close" onClick={onCancel}>
+                닫기
+              </Button>,
+            ]
+          : undefined
+      }
     >
       <Form layout="vertical">
-        <Form.Item label="제목" required>
-          <Input
-            value={formData.title}
-            onChange={(e) =>
-              setFormData((prev) => ({ ...prev, title: e.target.value }))
-            }
-            placeholder="제목을 입력하세요"
-            disabled={isLoadingPost}
-          />
+        <Form.Item label="제목" required={!isReadOnly}>
+          {isReadOnly ? (
+            <div style={{ padding: "4px 0" }}>{formData.title}</div>
+          ) : (
+            <Input
+              value={formData.title}
+              onChange={(e) =>
+                setFormData((prev) => ({ ...prev, title: e.target.value }))
+              }
+              placeholder="제목을 입력하세요"
+              disabled={isLoadingPost}
+            />
+          )}
         </Form.Item>
 
-        <Form.Item label="카테고리" required>
-          <Select
-            value={formData.category}
-            onChange={(value) =>
-              setFormData((prev) => ({ ...prev, category: value }))
-            }
-            options={[
-              { label: "공지사항", value: "NOTICE" },
-              { label: "Q&A", value: "QNA" },
-              { label: "자유게시판", value: "FREE" },
-            ]}
-            disabled={isLoadingPost}
-          />
+        <Form.Item label="카테고리" required={!isReadOnly}>
+          {isReadOnly ? (
+            <div style={{ padding: "4px 0" }}>
+              {formData.category === "NOTICE"
+                ? "공지사항"
+                : formData.category === "QNA"
+                ? "Q&A"
+                : "자유게시판"}
+            </div>
+          ) : (
+            <Select
+              value={formData.category}
+              onChange={(value) =>
+                setFormData((prev) => ({ ...prev, category: value }))
+              }
+              options={[
+                { label: "공지사항", value: "NOTICE" },
+                { label: "Q&A", value: "QNA" },
+                { label: "자유게시판", value: "FREE" },
+              ]}
+              disabled={isLoadingPost}
+            />
+          )}
         </Form.Item>
 
-        <Form.Item label="본문" required>
-          <TextArea
-            value={formData.body}
-            onChange={(e) =>
-              setFormData((prev) => ({ ...prev, body: e.target.value }))
-            }
-            placeholder="본문을 입력하세요"
-            rows={6}
-            disabled={isLoadingPost}
-          />
+        <Form.Item label="본문" required={!isReadOnly}>
+          {isReadOnly ? (
+            <div
+              style={{
+                padding: "8px 11px",
+                border: "1px solid #d9d9d9",
+                borderRadius: "6px",
+                minHeight: "150px",
+                whiteSpace: "pre-wrap",
+                backgroundColor: "#fafafa",
+              }}
+            >
+              {formData.body}
+            </div>
+          ) : (
+            <TextArea
+              value={formData.body}
+              onChange={(e) =>
+                setFormData((prev) => ({ ...prev, body: e.target.value }))
+              }
+              placeholder="본문을 입력하세요"
+              rows={6}
+              disabled={isLoadingPost}
+            />
+          )}
         </Form.Item>
 
         <Form.Item label="태그">
@@ -142,7 +189,7 @@ export function PostFormModal({
             {(formData.tags ?? []).map((tag) => (
               <Tag
                 key={tag}
-                closable
+                closable={!isReadOnly}
                 onClose={() => handleRemoveTag(tag)}
                 style={{ marginBottom: 4 }}
               >
@@ -150,13 +197,15 @@ export function PostFormModal({
               </Tag>
             ))}
           </div>
-          <Input
-            value={tagInput}
-            onChange={(e) => setTagInput(e.target.value)}
-            onPressEnter={handleAddTag}
-            placeholder="태그 입력 후 Enter"
-            disabled={isLoadingPost}
-          />
+          {!isReadOnly && (
+            <Input
+              value={tagInput}
+              onChange={(e) => setTagInput(e.target.value)}
+              onPressEnter={handleAddTag}
+              placeholder="태그 입력 후 Enter"
+              disabled={isLoadingPost}
+            />
+          )}
         </Form.Item>
 
         {isLoadingPost && (

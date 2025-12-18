@@ -8,7 +8,6 @@ import { useMutation } from "@tanstack/react-query";
 import { App } from "antd";
 import { BoardQueries } from "@/modules/queries/board-queries";
 import { validatePostParams } from "../utils/forbidden-words";
-import { getQueryClient } from "@/shared/libs/query-client";
 
 export function useBoard() {
   const { message } = App.useApp();
@@ -16,6 +15,7 @@ export function useBoard() {
   // 모달 상태
   const [createModalOpen, setCreateModalOpen] = useState(false);
   const [editModalOpen, setEditModalOpen] = useState(false);
+  const [viewModalOpen, setViewModalOpen] = useState(false);
   const [deleteModalOpen, setDeleteModalOpen] = useState(false);
   const [selectedPost, setSelectedPost] = useState<Board.Post | null>(null);
 
@@ -85,6 +85,11 @@ export function useBoard() {
     setCreateModalOpen(true);
   }, []);
 
+  const handleViewClick = useCallback((post: Board.Post) => {
+    setSelectedPost(post);
+    setViewModalOpen(true);
+  }, []);
+
   const handleEditClick = useCallback((post: Board.Post) => {
     setSelectedPost(post);
     setEditModalOpen(true);
@@ -123,19 +128,42 @@ export function useBoard() {
   }, []);
 
   return {
+    // 모달 상태
     createModalOpen,
     editModalOpen,
+    viewModalOpen,
     deleteModalOpen,
     selectedPost,
+
+    // mutation 로딩 상태
     isCreating,
     isUpdating,
     isDeleting,
+
+    // 핸들러
     handleCreateClick,
+    handleViewClick,
     handleEditClick,
     handleDeleteClick,
-    handleCreateSubmit,
-    handleEditSubmit,
-    handleDeleteConfirm,
-    handleModalCancel,
+
+    // 모달 닫기
+    onCreateModalClose: () => setCreateModalOpen(false),
+    onEditModalClose: () => {
+      setEditModalOpen(false);
+      setSelectedPost(null);
+    },
+    onViewModalClose: () => {
+      setViewModalOpen(false);
+      setSelectedPost(null);
+    },
+    onDeleteModalClose: () => {
+      setDeleteModalOpen(false);
+      setSelectedPost(null);
+    },
+
+    // mutation
+    createPost,
+    updatePost,
+    deletePost,
   };
 }
