@@ -21,6 +21,7 @@ import { Resizable, ResizeCallbackData } from "react-resizable";
 import { format } from "date-fns";
 import styled from "styled-components";
 import "react-resizable/css/styles.css";
+import { useAuthStore } from "@/stores/auth-store";
 
 interface BoardTableProps {
   posts: Board.Post[];
@@ -91,6 +92,9 @@ export function BoardTable({
   onLoadMore,
   onLoadPrevious,
 }: BoardTableProps): React.ReactElement {
+  // 현재 로그인한 사용자 정보
+  const user = useAuthStore((state) => state.user);
+
   // 컬럼 너비 상태
   const [columns, setColumns] = useState<ColumnsType<Board.Post>>([
     {
@@ -148,27 +152,30 @@ export function BoardTable({
       title: "액션",
       key: "actions",
       width: 150,
-      render: (_: unknown, post: Board.Post) => (
-        <Space>
-          <Button
-            type="link"
-            size="small"
-            icon={<EditOutlined />}
-            onClick={() => onEdit(post)}
-          >
-            수정
-          </Button>
-          <Button
-            type="link"
-            size="small"
-            danger
-            icon={<DeleteOutlined />}
-            onClick={() => onDelete(post)}
-          >
-            삭제
-          </Button>
-        </Space>
-      ),
+      render: (_: unknown, post: Board.Post) => {
+        // 현재 사용자와 게시글 작성자가 일치하는 경우에만 버튼 표시
+        if (user?.id !== post.userId) {
+          return null;
+        }
+
+        return (
+          <Space>
+            <Button
+              type="link"
+              size="small"
+              icon={<EditOutlined />}
+              onClick={() => onEdit(post)}
+            />
+            <Button
+              type="link"
+              size="small"
+              danger
+              icon={<DeleteOutlined />}
+              onClick={() => onDelete(post)}
+            />
+          </Space>
+        );
+      },
     },
   ]);
 
