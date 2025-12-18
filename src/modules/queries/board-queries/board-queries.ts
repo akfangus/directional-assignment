@@ -227,6 +227,22 @@ export class BoardQueries {
   }
 
   /**
+   * 내글 모두 삭제 Mutation
+   */
+  static mutationDeleteAllPosts(): UseMutationOptions<void, Error, void> {
+    return {
+      mutationFn: () => BoardService.deleteAllPosts(),
+      onSuccess: () => {
+        const queryClient = getQueryClient();
+        // 모든 게시글 데이터 새로고침
+        queryClient.refetchQueries({
+          queryKey: this.keys.posts(),
+        });
+      },
+    };
+  }
+
+  /**
    * 쿼리 무효화 헬퍼 메서드
    * QueryClient를 전달받지 않고 싱글톤 인스턴스를 사용
    */

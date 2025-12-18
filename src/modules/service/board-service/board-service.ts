@@ -51,4 +51,11 @@ export class BoardService {
   static async deletePost(id: string): Promise<void> {
     await apiClient.delete(`/posts/${id}`);
   }
+
+  /**
+   * 내글 모두 삭제
+   */
+  static async deleteAllPosts(): Promise<void> {
+    await apiClient.delete("/posts");
+  }
 }

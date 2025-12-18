@@ -19,6 +19,7 @@ interface BoardToolbarProps {
   onOrderChange: (value: Board.OrderType) => void;
   onCategoryChange: (value?: Board.Category) => void;
   onCreateClick: () => void;
+  onDeleteAllClick: () => void;
 }
 
 export function BoardToolbar({
@@ -32,6 +33,7 @@ export function BoardToolbar({
   onOrderChange,
   onCategoryChange,
   onCreateClick,
+  onDeleteAllClick,
 }: BoardToolbarProps): React.ReactElement {
   return (
     <ToolbarContainer>
@@ -100,11 +102,16 @@ export function BoardToolbar({
           새 글 작성
         </Button>
       </RightSection>
+
+      <DeleteAllButton size="small" danger onClick={onDeleteAllClick}>
+        내글 모두 삭제
+      </DeleteAllButton>
     </ToolbarContainer>
   );
 }
 
 const ToolbarContainer = styled.div`
+  position: relative;
   display: flex;
   justify-content: space-between;
   align-items: center;
@@ -130,4 +137,11 @@ const RightSection = styled.div`
 
 const CategoryButton = styled(Button)`
   min-width: 80px;
+`;
+
+const DeleteAllButton = styled(Button)`
+  position: absolute;
+  bottom: 8px;
+  right: 8px;
+  font-size: 12px;
 `;

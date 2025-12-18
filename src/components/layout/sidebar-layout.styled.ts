@@ -31,7 +31,7 @@ export const LogoContainer = styled.div`
 `;
 
 export const LogoTitle = styled.h1`
-  color: #fff;
+  color: #000;
   font-size: 18px;
   font-weight: 600;
   margin: 0;
@@ -46,9 +46,9 @@ export const ContentWrapper = styled(Layout)`
 `;
 
 export const StyledContent = styled(Content)`
-  margin: 24px;
-  padding: 24px;
+  margin: 0;
+  padding: 0;
   background: #fff;
   border-radius: 8px;
-  min-height: calc(100vh - 48px);
+  min-height: 100vh;
 `;

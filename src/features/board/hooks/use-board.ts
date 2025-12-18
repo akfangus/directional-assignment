@@ -17,6 +17,7 @@ export function useBoard() {
   const [editModalOpen, setEditModalOpen] = useState(false);
   const [viewModalOpen, setViewModalOpen] = useState(false);
   const [deleteModalOpen, setDeleteModalOpen] = useState(false);
+  const [deleteAllModalOpen, setDeleteAllModalOpen] = useState(false);
   const [selectedPost, setSelectedPost] = useState<Board.Post | null>(null);
 
   // Mutations
@@ -80,6 +81,19 @@ export function useBoard() {
     },
   });
 
+  const { mutate: deleteAllPosts, isPending: isDeletingAll } = useMutation({
+    ...BoardQueries.mutationDeleteAllPosts(),
+    onSettled: (data, error) => {
+      if (error) {
+        message.error("모든 게시글 삭제에 실패했습니다");
+        return;
+      }
+
+      message.success("모든 게시글이 삭제되었습니다");
+      setDeleteAllModalOpen(false);
+    },
+  });
+
   // 핸들러
   const handleCreateClick = useCallback(() => {
     setCreateModalOpen(true);
@@ -120,10 +134,19 @@ export function useBoard() {
     deletePost(selectedPost.id);
   }, [deletePost, selectedPost?.id]);
 
+  const handleDeleteAllClick = useCallback(() => {
+    setDeleteAllModalOpen(true);
+  }, []);
+
+  const handleDeleteAllConfirm = useCallback(() => {
+    deleteAllPosts();
+  }, [deleteAllPosts]);
+
   const handleModalCancel = useCallback(() => {
     setCreateModalOpen(false);
     setEditModalOpen(false);
     setDeleteModalOpen(false);
+    setDeleteAllModalOpen(false);
     setSelectedPost(null);
   }, []);
 
@@ -133,18 +156,21 @@ export function useBoard() {
     editModalOpen,
     viewModalOpen,
     deleteModalOpen,
+    deleteAllModalOpen,
     selectedPost,
 
     // mutation 로딩 상태
     isCreating,
     isUpdating,
     isDeleting,
+    isDeletingAll,
 
     // 핸들러
     handleCreateClick,
     handleViewClick,
     handleEditClick,
     handleDeleteClick,
+    handleDeleteAllClick,
 
     // 모달 닫기
     onCreateModalClose: () => setCreateModalOpen(false),
@@ -160,10 +186,20 @@ export function useBoard() {
       setDeleteModalOpen(false);
       setSelectedPost(null);
     },
+    onDeleteAllModalClose: () => {
+      setDeleteAllModalOpen(false);
+    },
 
     // mutation
     createPost,
     updatePost,
     deletePost,
+    deleteAllPosts,
+
+    // submit 핸들러
+    handleCreateSubmit,
+    handleEditSubmit,
+    handleDeleteConfirm,
+    handleDeleteAllConfirm,
   };
 }

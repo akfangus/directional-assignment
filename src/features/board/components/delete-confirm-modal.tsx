@@ -7,18 +7,24 @@ import { ExclamationCircleOutlined } from "@ant-design/icons";
 
 interface DeleteConfirmModalProps {
   open: boolean;
-  post: Board.Post | null;
+  title?: string;
+  content?: string;
+  post?: Board.Post | null;
   onConfirm: () => void;
   onCancel: () => void;
   loading?: boolean;
+  confirmLoading?: boolean;
 }
 
 export function DeleteConfirmModal({
   open,
+  title = "게시글 삭제",
+  content,
   post,
   onConfirm,
   onCancel,
   loading,
+  confirmLoading,
 }: DeleteConfirmModalProps): React.ReactElement {
   return (
     <Modal
@@ -28,7 +34,7 @@ export function DeleteConfirmModal({
           <ExclamationCircleOutlined
             style={{ color: "#ff4d4f", marginRight: 8 }}
           />
-          게시글 삭제
+          {title}
         </span>
       }
       onOk={onConfirm}
@@ -36,9 +42,9 @@ export function DeleteConfirmModal({
       okText="삭제"
       cancelText="취소"
       okButtonProps={{ danger: true }}
-      confirmLoading={loading}
+      confirmLoading={loading || confirmLoading}
     >
-      <p>정말 이 게시글을 삭제하시겠습니까?</p>
+      <p>{content || "정말 이 게시글을 삭제하시겠습니까?"}</p>
       {post && (
         <p style={{ color: "#666" }}>
           <strong>{post.title}</strong>

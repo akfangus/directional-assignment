@@ -26,7 +26,7 @@ export function SidebarLayout({
 }: SidebarLayoutProps): React.ReactElement {
   return (
     <StyledLayout>
-      <StyledSider width={200} theme="dark">
+      <StyledSider width={200} style={{ backgroundColor: "#fff" }}>
         <LogoContainer>
           <LogoTitle>{title}</LogoTitle>
         </LogoContainer>

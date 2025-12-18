@@ -48,18 +48,23 @@ export function BoardPage(): React.ReactElement {
     editModalOpen,
     viewModalOpen,
     deleteModalOpen,
+    deleteAllModalOpen,
     selectedPost,
     isCreating,
     isUpdating,
     isDeleting,
+    isDeletingAll,
     handleCreateClick,
     handleViewClick,
     handleEditClick,
     handleDeleteClick,
+    handleDeleteAllClick,
+    handleDeleteAllConfirm,
     onCreateModalClose,
     onEditModalClose,
     onViewModalClose,
     onDeleteModalClose,
+    onDeleteAllModalClose,
     createPost,
     updatePost,
     deletePost,
@@ -87,6 +92,7 @@ export function BoardPage(): React.ReactElement {
         onOrderChange={setOrder}
         onCategoryChange={setCategory}
         onCreateClick={handleCreateClick}
+        onDeleteAllClick={handleDeleteAllClick}
       />
 
       <BoardTable
@@ -133,6 +139,15 @@ export function BoardPage(): React.ReactElement {
         onConfirm={() => selectedPost && deletePost(selectedPost.id)}
         onCancel={onDeleteModalClose}
         loading={isDeleting}
+      />
+
+      <DeleteConfirmModal
+        open={deleteAllModalOpen}
+        title="모든 게시글 삭제"
+        content="정말로 작성한 모든 게시글을 삭제하시겠습니까? 이 작업은 되돌릴 수 없습니다."
+        confirmLoading={isDeletingAll}
+        onConfirm={handleDeleteAllConfirm}
+        onCancel={onDeleteAllModalClose}
       />
     </Container>
   );
