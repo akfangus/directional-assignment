@@ -98,14 +98,13 @@ export function BoardToolbar({
       </LeftSection>
 
       <RightSection>
+        <DeleteAllButton size="small" danger onClick={onDeleteAllClick}>
+          내글 모두 삭제
+        </DeleteAllButton>
         <Button type="primary" icon={<PlusOutlined />} onClick={onCreateClick}>
           새 글 작성
         </Button>
       </RightSection>
-
-      <DeleteAllButton size="small" danger onClick={onDeleteAllClick}>
-        내글 모두 삭제
-      </DeleteAllButton>
     </ToolbarContainer>
   );
 }
@@ -133,6 +132,7 @@ const LeftSection = styled.div`
 const RightSection = styled.div`
   display: flex;
   align-items: center;
+  gap: 8px;
 `;
 
 const CategoryButton = styled(Button)`
@@ -140,8 +140,5 @@ const CategoryButton = styled(Button)`
 `;
 
 const DeleteAllButton = styled(Button)`
-  position: absolute;
-  bottom: 8px;
-  right: 8px;
   font-size: 12px;
 `;
