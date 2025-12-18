@@ -27,8 +27,11 @@ interface BoardTableProps {
   onEdit: (post: Board.Post) => void;
   onDelete: (post: Board.Post) => void;
   hasNextPage: boolean;
+  hasPreviousPage: boolean;
   isFetchingNextPage: boolean;
+  isFetchingPreviousPage: boolean;
   onLoadMore: () => void;
+  onLoadPrevious: () => void;
 }
 
 // Resizable 헤더 컴포넌트
@@ -82,8 +85,11 @@ export function BoardTable({
   onEdit,
   onDelete,
   hasNextPage,
+  hasPreviousPage,
   isFetchingNextPage,
+  isFetchingPreviousPage,
   onLoadMore,
+  onLoadPrevious,
 }: BoardTableProps): React.ReactElement {
   // 컬럼 너비 상태
   const [columns, setColumns] = useState<ColumnsType<Board.Post>>([
@@ -178,17 +184,29 @@ export function BoardTable({
     }
   );
 
-  // Intersection Observer로 무한 스크롤 구현
-  const { ref, inView } = useInView({
+  // 양방향 무한 스크롤 - 하단 감지 (다음 페이지)
+  const { ref: bottomRef, inView: bottomInView } = useInView({
+    threshold: 0,
+    rootMargin: "100px",
+  });
+
+  // 양방향 무한 스크롤 - 상단 감지 (이전 페이지)
+  const { ref: topRef, inView: topInView } = useInView({
     threshold: 0,
     rootMargin: "100px",
   });
 
   useEffect(() => {
-    if (inView && hasNextPage && !isFetchingNextPage) {
+    if (bottomInView && hasNextPage && !isFetchingNextPage) {
       onLoadMore();
     }
-  }, [inView, hasNextPage, isFetchingNextPage, onLoadMore]);
+  }, [bottomInView, hasNextPage, isFetchingNextPage, onLoadMore]);
+
+  useEffect(() => {
+    if (topInView && hasPreviousPage && !isFetchingPreviousPage) {
+      onLoadPrevious();
+    }
+  }, [topInView, hasPreviousPage, isFetchingPreviousPage, onLoadPrevious]);
 
   // 리사이즈 핸들러
   const handleResize =
@@ -239,6 +257,19 @@ export function BoardTable({
 
   return (
     <div>
+      {/* 상단 무한 스크롤 트리거 영역 */}
+      {hasPreviousPage && (
+        <div
+          ref={!isFetchingPreviousPage ? topRef : undefined}
+          style={{
+            padding: "16px",
+            textAlign: "center",
+          }}
+        >
+          {isFetchingPreviousPage ? "이전 페이지 로딩 중..." : ""}
+        </div>
+      )}
+
       <ToolbarContainer>
         <Dropdown menu={{ items: columnMenuItems }} trigger={["click"]}>
           <Button icon={<SettingOutlined />}>컬럼 설정</Button>
@@ -252,7 +283,6 @@ export function BoardTable({
           rowKey="id"
           pagination={false}
           scroll={{
-            y: "calc(100vh - 280px)",
             x: "max-content",
           }}
           components={{
@@ -263,16 +293,16 @@ export function BoardTable({
         />
       </StyledTableWrapper>
 
-      {/* 무한 스크롤 트리거 영역 */}
+      {/* 하단 무한 스크롤 트리거 영역 */}
       {hasNextPage && (
         <div
-          ref={ref}
+          ref={!isFetchingNextPage ? bottomRef : undefined}
           style={{
             padding: "16px",
             textAlign: "center",
           }}
         >
-          {isFetchingNextPage ? "로딩 중..." : ""}
+          {isFetchingNextPage ? "다음 페이지 로딩 중..." : ""}
         </div>
       )}
     </div>

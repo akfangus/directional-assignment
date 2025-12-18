@@ -10,14 +10,21 @@ Content-Type: application/json
   "password": "R3pS4tQwU5"
 }
 
-### POST 게시글 작성
+### POST 게시글 작성 NOTICE | FREE | QNA
 POST {{host}}/posts
 Content-Type: application/json
 Authorization: Bearer {{AccessToken}}
 
 {
-    "title": "테스트 게시글",
-    "body": "테스트 게시글 내용",
+    "title": "테스트 게시글1",
+    "body": "테스트 게시글 내용22",
     "category": "NOTICE",   
     "tags": ["테스트", "게시글"]
 }
+
+### get POST(본인것)
+GET {{host}}/posts?limit=10&nextCursor=eyJzIjoiY3JlYXRlZEF0IiwibyI6ImRlc2MiLCJ2IjoiMjAyNS0xMi0xOFQwMjowMDoxMC4yOTdaIiwiaWQiOiJjbWphc21lNjEwMDB6bDEwNHlvaDRmNmZmIn0
+Content-Type: application/json
+Authorization: Bearer {{AccessToken}}
+
+

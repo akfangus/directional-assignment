@@ -42,23 +42,22 @@ export class BoardQueries {
   /**
    * 게시글 목록 조회 (무한 스크롤)
    */
-  static queryInfinitePosts(params: Omit<Board.PostsParams, "page"> = {}) {
+  static queryInfinitePosts(
+    params: Omit<Board.PostsParams, "nextCursor" | "prevCursor"> = {}
+  ) {
     return {
       queryKey: this.keys.postsInfinite(params),
-      queryFn: async ({ pageParam }: { pageParam: number }) =>
+      queryFn: async ({ pageParam }: { pageParam?: string }) =>
         BoardService.fetchPosts({
           ...params,
           limit: this.POSTS_LIMIT_PER_PAGE,
-          page: pageParam,
+          nextCursor: pageParam,
         }),
-      initialPageParam: 1,
-      getNextPageParam: (
-        lastPage: Board.PostsResponse,
-        allPages: Board.PostsResponse[]
-      ) => {
-        const hasMore = lastPage.items.length >= this.POSTS_LIMIT_PER_PAGE;
-        return hasMore ? allPages.length + 1 : undefined;
-      },
+      initialPageParam: undefined as string | undefined,
+      getNextPageParam: (lastPage: Board.PostsResponse) =>
+        lastPage.nextCursor ?? undefined,
+      getPrevPageParam: (firstPage: Board.PostsResponse) =>
+        firstPage.prevCursor ?? undefined,
     };
   }
 

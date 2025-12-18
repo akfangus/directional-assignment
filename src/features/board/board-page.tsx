@@ -24,15 +24,23 @@ export function BoardPage(): React.ReactElement {
     setSearch(searchInput);
   };
 
-  const { data, fetchNextPage, hasNextPage, isFetchingNextPage, isLoading } =
-    useInfiniteQuery(
-      BoardQueries.queryInfinitePosts({
-        search: search || undefined,
-        sort,
-        order,
-        category,
-      })
-    );
+  const {
+    data,
+    fetchNextPage,
+    fetchPreviousPage,
+    hasNextPage,
+    hasPreviousPage,
+    isFetchingNextPage,
+    isFetchingPreviousPage,
+    isLoading,
+  } = useInfiniteQuery(
+    BoardQueries.queryInfinitePosts({
+      search: search || undefined,
+      sort,
+      order,
+      category,
+    })
+  );
 
   // 게시판 로직 (모달, mutation, 핸들러)
   const {
@@ -81,8 +89,11 @@ export function BoardPage(): React.ReactElement {
         onEdit={handleEditClick}
         onDelete={handleDeleteClick}
         hasNextPage={!!hasNextPage}
+        hasPreviousPage={!!hasPreviousPage}
         isFetchingNextPage={isFetchingNextPage}
+        isFetchingPreviousPage={isFetchingPreviousPage}
         onLoadMore={fetchNextPage}
+        onLoadPrevious={fetchPreviousPage}
       />
 
       <PostFormModal

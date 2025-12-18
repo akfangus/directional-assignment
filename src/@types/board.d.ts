@@ -32,7 +32,6 @@ declare namespace Board {
    */
   interface PostsResponse {
     items: Post[];
-    count: number;
     nextCursor?: string;
     prevCursor?: string;
   }
@@ -41,13 +40,13 @@ declare namespace Board {
    * 게시글 목록 조회 파라미터
    */
   interface PostsParams {
-    page?: number;
     limit?: number;
     category?: Category;
     search?: string;
     sort?: string;
     order?: OrderType;
-    cursor?: string;
+    nextCursor?: string;
+    prevCursor?: string;
   }
 
   /**
